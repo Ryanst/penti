@@ -14,12 +14,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ryanst.penti.R;
 import com.ryanst.penti.bean.News;
 import com.ryanst.penti.network.GetListRequest;
 import com.ryanst.penti.network.GetListResponse;
 import com.ryanst.penti.network.NetClientAPI;
+import com.ryanst.penti.widget.DividerItemDecoration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +83,11 @@ public class ListFragment extends Fragment {
 
         rvNewList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        rvNewList.addItemDecoration(new DividerItemDecoration(getActivity()));
+
+        rvNewList.addItemDecoration(new RecyclerView.ItemDecoration() {
+        });
+
         adapter = new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
             @Override
             public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -89,8 +96,14 @@ public class ListFragment extends Fragment {
             }
 
             @Override
-            public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
                 ((TextView) holder.itemView.findViewById(R.id.tv_title)).setText(newsList.get(position).getTitle());
+                holder.itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        dealItemOnClick(position);
+                    }
+                });
             }
 
             @Override
@@ -99,6 +112,10 @@ public class ListFragment extends Fragment {
             }
         };
         rvNewList.setAdapter(adapter);
+    }
+
+    private void dealItemOnClick(int position) {
+        Toast.makeText(getActivity(), "you press position: " + position, Toast.LENGTH_SHORT);
     }
 
 
@@ -129,12 +146,14 @@ public class ListFragment extends Fragment {
             @Override
             public void onResponse(Call<GetListResponse> call, Response<GetListResponse> response) {
                 swipeRefresh.setRefreshing(false);
-                GetListResponse body = response.body();
-                if (response != null && body != null) {
-                    newsList.addAll(body.getNewsList());
-                    pageToken = body.getMoreInfo().getNextPageToken();
-                    Log.d("TTTT", Thread.currentThread().getId() + "");
-                    handler.sendEmptyMessage(0);
+                if (response != null && response.body() != null) {
+                    GetListResponse body = response.body();
+                    if (response != null && body != null) {
+                        newsList.addAll(body.getNewsList());
+                        pageToken = body.getMoreInfo().getNextPageToken();
+                        Log.d("TTTT", Thread.currentThread().getId() + "");
+                        handler.sendEmptyMessage(0);
+                    }
                 }
             }
 
