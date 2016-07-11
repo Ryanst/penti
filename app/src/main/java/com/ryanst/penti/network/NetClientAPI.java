@@ -14,6 +14,8 @@ import com.ryanst.penti.core.MyApplication;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
@@ -35,7 +37,7 @@ public class NetClientAPI {
 
 
     public static class NetConfig {
-        public static final String HOST = "http://yuedu.163.com";
+        public static final String HOST = "http://yuedu.163.com/";
     }
 
     private static RestInterface restService;
@@ -86,7 +88,9 @@ public class NetClientAPI {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(NetConfig.HOST)
                 .client(okHttpClient)
+//                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(buildGsonConverter())
+//                .addConverterFactory(GsonConverterFactory.create())
                 .build();
         restService = retrofit.create(RestInterface.class);
     }
@@ -116,12 +120,34 @@ public class NetClientAPI {
             response.setMoreInfo(moreInfo);
 
             JsonArray newsList = (JsonArray) array.get(1);
+            List<News> emptyNews = new ArrayList<>();
+            response.setNewsList(emptyNews);
 
             int newsNum = newsList.size();
             for (int i = 0; i < newsNum; i++) {
                 JsonObject newsJson = (JsonObject) newsList.get(i);
                 News news = new News();
-                news.setSource(newsJson.get("sourceID").getAsString());
+                news.setSourceID(newsJson.get("sourceID").getAsString());
+                news.setTitle(newsJson.get("title").getAsString());
+                news.setSource(newsJson.get("source").getAsString());
+                news.setBreif(newsJson.get("breif").getAsString());
+                news.setContentID(newsJson.get("contentID").getAsString());
+                news.setPosttime(newsJson.get("posttime").getAsString());
+
+                List<String> imageList = new ArrayList<>();
+                JsonArray imageArray = newsJson.get("images").getAsJsonArray();
+                int imageNum = imageArray.size();
+                for (int j = 0; j < imageNum; j++) {
+                    String imageUrl = imageArray.get(j).getAsString();
+                    imageList.add(imageUrl);
+                }
+
+                news.setImages(imageList);
+                News.SummaryImageBean summaryImageBean = new News.SummaryImageBean();
+                JsonObject summaryImageJsonObject = newsJson.get("summaryImage").getAsJsonObject();
+                summaryImageBean.setSummaryImageURL(summaryImageJsonObject.get("summaryImageURL").getAsString());
+                news.setSummaryImage(summaryImageBean);
+
                 response.getNewsList().add(news);
             }
             return response;
@@ -134,7 +160,6 @@ public class NetClientAPI {
             return;
         }
 
-        restService.getNewsList(request.getOperation(), request.getId());
+        restService.getNewsList(request.getOperation(), request.getId()).enqueue(callback);
     }
-
 }

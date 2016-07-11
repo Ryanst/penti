@@ -12,6 +12,9 @@ public class GetListRequest extends BaseRequest {
     @SerializedName("id")
     private String id;
 
+    @SerializedName("pageToken")
+    private String pageToken;
+
     public String getOperation() {
         return operation;
     }
@@ -26,5 +29,13 @@ public class GetListRequest extends BaseRequest {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getPageToken() {
+        return pageToken;
+    }
+
+    public void setPageToken(String pageToken) {
+        this.pageToken = pageToken;
     }
 }
