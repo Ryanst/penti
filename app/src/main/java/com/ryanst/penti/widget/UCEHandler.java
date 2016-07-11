@@ -7,11 +7,9 @@ import android.content.Intent;
 import android.os.Looper;
 import android.widget.Toast;
 
-import com.orhanobut.logger.Logger;
-import com.ryanst.app.core.MainActivity;
-import com.ryanst.app.core.RyanstApp;
 import com.ryanst.penti.core.MyApplication;
 import com.ryanst.penti.ui.MainActivity;
+
 
 /**
  * Created by zhengjuntong on 15/11/19.

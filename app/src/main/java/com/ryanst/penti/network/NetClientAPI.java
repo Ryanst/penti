@@ -86,18 +86,19 @@ public class NetClientAPI {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(NetConfig.HOST)
                 .client(okHttpClient)
-                .addConverterFactory(new GsonConverterFactory(gson))
+                .addConverterFactory(buildGsonConverter())
                 .build();
         restService = retrofit.create(RestInterface.class);
     }
 
-    private static Gson gson = initGson();
 
-    private static Gson initGson() {
-        if (gson == null) {
-            gson = new GsonBuilder().registerTypeAdapter(GetListResponse.class, new DictionaryResponseDeserializer()).create();
-        }
-        return gson;
+    private static GsonConverterFactory buildGsonConverter() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+
+        gsonBuilder.registerTypeAdapter(GetListResponse.class, new DictionaryResponseDeserializer());
+        Gson gson = gsonBuilder.create();
+
+        return GsonConverterFactory.create(gson);
     }
 
     public static class DictionaryResponseDeserializer implements JsonDeserializer<GetListResponse> {
