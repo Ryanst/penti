@@ -42,6 +42,9 @@ import retrofit2.Response;
 public class ListFragment extends Fragment {
     public static final String QUERY_CONTENT_LIST = "queryContentList";
     public static final int PAGE_SIZE = 24;
+    public static final int REFRESH = 0;
+    public static final int NO_MORE = 1;
+    public static final int NETWORK_FAIL = -1;
     @BindView(R.id.rv_new_list)
     RecyclerView rvNewList;
 
@@ -54,6 +57,7 @@ public class ListFragment extends Fragment {
     private List<News> newsList;
     private RecyclerView.Adapter<RecyclerView.ViewHolder> adapter;
     private HeaderAndFooterRecyclerViewAdapter loadMoreAdapter = null;
+    private boolean more = true;
 
     @Nullable
     @Override
@@ -128,7 +132,7 @@ public class ListFragment extends Fragment {
         @Override
         public void onLoadNextPage(View view) {
             LoadingFooter.State state = RecyclerViewStateUtils.getFooterViewState(rvNewList);
-            if (state == LoadingFooter.State.Loading) {
+            if (state == LoadingFooter.State.Loading || !more) {
                 return;
             }
 
@@ -155,7 +159,19 @@ public class ListFragment extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            loadMoreAdapter.notifyDataSetChanged();
+            switch (msg.what) {
+                case REFRESH:
+                    loadMoreAdapter.notifyDataSetChanged();
+                case NO_MORE:
+                    loadMoreAdapter.notifyDataSetChanged();
+                    RecyclerViewStateUtils.setFooterViewState(rvNewList, LoadingFooter.State.TheEnd);
+                    break;
+                case NETWORK_FAIL:
+                    RecyclerViewStateUtils.setFooterViewState(getActivity(), rvNewList, PAGE_SIZE, LoadingFooter.State.NetWorkError, mFooterClick);
+                    break;
+                default:
+                    break;
+            }
         }
     };
 
@@ -175,8 +191,14 @@ public class ListFragment extends Fragment {
                     if (response != null && body != null) {
                         newsList.addAll(body.getNewsList());
                         ListFragment.this.pageToken = body.getMoreInfo().getNextPageToken();
+                        ListFragment.this.more = body.getMoreInfo().isMore();
                         Log.d("CurrentThreadId", Thread.currentThread().getId() + "");
-                        handler.sendEmptyMessage(0);
+
+                        if (more) {
+                            handler.sendEmptyMessage(REFRESH);
+                        } else {
+                            handler.sendEmptyMessage(NO_MORE);
+                        }
                     }
                 }
             }
@@ -184,9 +206,22 @@ public class ListFragment extends Fragment {
             @Override
             public void onFailure(Call<GetListResponse> call, Throwable t) {
                 swipeRefresh.setRefreshing(false);
+                handler.sendEmptyMessage(NETWORK_FAIL);
             }
         });
     }
+
+    private View.OnClickListener mFooterClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (more) {
+                RecyclerViewStateUtils.setFooterViewState(getActivity(), rvNewList, PAGE_SIZE, LoadingFooter.State.Loading, null);
+                refresh(pageToken);
+            } else {
+                Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_SHORT);
+            }
+        }
+    };
 
     @Override
     public void onDestroy() {
