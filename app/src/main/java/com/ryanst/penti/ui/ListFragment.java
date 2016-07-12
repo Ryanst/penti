@@ -22,6 +22,10 @@ import com.ryanst.penti.network.GetListRequest;
 import com.ryanst.penti.network.GetListResponse;
 import com.ryanst.penti.network.NetClientAPI;
 import com.ryanst.penti.widget.DividerItemDecoration;
+import com.ryanst.penti.widget.recyclerview.EndlessRecyclerOnScrollListener;
+import com.ryanst.penti.widget.recyclerview.HeaderAndFooterRecyclerViewAdapter;
+import com.ryanst.penti.widget.recyclerview.LoadingFooter;
+import com.ryanst.penti.widget.recyclerview.RecyclerViewStateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +41,7 @@ import retrofit2.Response;
  */
 public class ListFragment extends Fragment {
     public static final String QUERY_CONTENT_LIST = "queryContentList";
+    public static final int PAGE_SIZE = 24;
     @BindView(R.id.rv_new_list)
     RecyclerView rvNewList;
 
@@ -48,6 +53,7 @@ public class ListFragment extends Fragment {
     private HandlerThread handlerThread;
     private List<News> newsList;
     private RecyclerView.Adapter<RecyclerView.ViewHolder> adapter;
+    private HeaderAndFooterRecyclerViewAdapter loadMoreAdapter = null;
 
     @Nullable
     @Override
@@ -111,11 +117,28 @@ public class ListFragment extends Fragment {
                 return newsList.size();
             }
         };
-        rvNewList.setAdapter(adapter);
+
+        loadMoreAdapter = new HeaderAndFooterRecyclerViewAdapter(adapter);
+        rvNewList.setAdapter(loadMoreAdapter);
+        rvNewList.addOnScrollListener(mOnScrollListener);
     }
 
+
+    private EndlessRecyclerOnScrollListener mOnScrollListener = new EndlessRecyclerOnScrollListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
+        @Override
+        public void onLoadNextPage(View view) {
+            LoadingFooter.State state = RecyclerViewStateUtils.getFooterViewState(rvNewList);
+            if (state == LoadingFooter.State.Loading) {
+                return;
+            }
+
+            RecyclerViewStateUtils.setFooterViewState(getActivity(), rvNewList, PAGE_SIZE, LoadingFooter.State.Loading, null);
+            refresh(pageToken);
+        }
+    });
+
     private void dealItemOnClick(int position) {
-        Toast.makeText(getActivity(), "you press position: " + position, Toast.LENGTH_SHORT);
+        Toast.makeText(getActivity(), "you press position: " + position, Toast.LENGTH_SHORT).show();
     }
 
 
@@ -132,15 +155,16 @@ public class ListFragment extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            adapter.notifyDataSetChanged();
+            loadMoreAdapter.notifyDataSetChanged();
         }
     };
 
 
-    private void refresh(final String page) {
+    private void refresh(final String pageToken) {
         GetListRequest request = new GetListRequest();
         request.setOperation(QUERY_CONTENT_LIST);
         request.setId(tuguaId);
+        request.setPageToken(pageToken);
 
         NetClientAPI.getNewsList(request, new Callback<GetListResponse>() {
             @Override
@@ -150,8 +174,8 @@ public class ListFragment extends Fragment {
                     GetListResponse body = response.body();
                     if (response != null && body != null) {
                         newsList.addAll(body.getNewsList());
-                        pageToken = body.getMoreInfo().getNextPageToken();
-                        Log.d("TTTT", Thread.currentThread().getId() + "");
+                        ListFragment.this.pageToken = body.getMoreInfo().getNextPageToken();
+                        Log.d("CurrentThreadId", Thread.currentThread().getId() + "");
                         handler.sendEmptyMessage(0);
                     }
                 }
