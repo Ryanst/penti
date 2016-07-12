@@ -1,11 +1,11 @@
 package com.ryanst.penti.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,15 +13,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.ryanst.penti.R;
 import com.ryanst.penti.bean.News;
+import com.ryanst.penti.core.BaseFragment;
 import com.ryanst.penti.network.GetListRequest;
 import com.ryanst.penti.network.GetListResponse;
 import com.ryanst.penti.network.NetClientAPI;
@@ -44,12 +43,13 @@ import retrofit2.Response;
 /**
  * Created by zhengjuntong on 7/11/16.
  */
-public class ListFragment extends Fragment {
+public class ListFragment extends BaseFragment {
     public static final String QUERY_CONTENT_LIST = "queryContentList";
     public static final int PAGE_SIZE = 24;
-    public static final int REFRESH = 0;
-    public static final int NO_MORE = 1;
+    public static final int REFRESH = 1;
+    public static final int NO_MORE = 2;
     public static final int NETWORK_FAIL = -1;
+    public static final int STOP_REFRESH = 0;
     @BindView(R.id.rv_new_list)
     RecyclerView rvNewList;
 
@@ -57,12 +57,13 @@ public class ListFragment extends Fragment {
     SwipeRefreshLayout swipeRefresh;
 
     private String pageToken;
-    private String tuguaId = "d1b01607-873f-400e-bd2f-332e5b9ce7f6_1";
     private HandlerThread handlerThread;
     private List<News> newsList;
     private RecyclerView.Adapter<RecyclerView.ViewHolder> adapter;
     private HeaderAndFooterRecyclerViewAdapter loadMoreAdapter = null;
     private boolean more = true;
+    private String tuguaId = "d1b01607-873f-400e-bd2f-332e5b9ce7f6_1";
+    private String baseUrl = "http://yuedu.163.com/source.do?operation=queryContentHtml";
 
     @Nullable
     @Override
@@ -195,13 +196,9 @@ public class ListFragment extends Fragment {
                 }
                 return TYPE_TEXT;
             }
-        }
+        };
 
-        ;
-
-        loadMoreAdapter = new
-
-                HeaderAndFooterRecyclerViewAdapter(adapter);
+        loadMoreAdapter = new HeaderAndFooterRecyclerViewAdapter(adapter);
 
         rvNewList.setAdapter(loadMoreAdapter);
         rvNewList.addOnScrollListener(mOnScrollListener);
@@ -245,7 +242,12 @@ public class ListFragment extends Fragment {
     });
 
     private void dealItemOnClick(int position) {
-        Toast.makeText(getActivity(), "you press position: " + position, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getActivity(), "you press position: " + position, Toast.LENGTH_SHORT).show();
+
+        String contentId = newsList.get(position).getContentID();
+        Intent intent = new Intent(getActivity(), DetailNewsActivity.class);
+        intent.putExtra("contentId", contentId);
+        getActivity().startActivity(intent);
     }
 
 
@@ -262,6 +264,7 @@ public class ListFragment extends Fragment {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            swipeRefresh.setRefreshing(false);
             switch (msg.what) {
                 case REFRESH:
                     loadMoreAdapter.notifyDataSetChanged();
@@ -272,12 +275,13 @@ public class ListFragment extends Fragment {
                 case NETWORK_FAIL:
                     RecyclerViewStateUtils.setFooterViewState(getActivity(), rvNewList, PAGE_SIZE, LoadingFooter.State.NetWorkError, mFooterClick);
                     break;
+                case STOP_REFRESH:
+                    break;
                 default:
                     break;
             }
         }
     };
-
 
     private void refresh(final String pageToken) {
         GetListRequest request = new GetListRequest();
@@ -288,7 +292,6 @@ public class ListFragment extends Fragment {
         NetClientAPI.getNewsList(request, new Callback<GetListResponse>() {
             @Override
             public void onResponse(Call<GetListResponse> call, Response<GetListResponse> response) {
-                swipeRefresh.setRefreshing(false);
                 if (response != null && response.body() != null) {
                     GetListResponse body = response.body();
                     if (response != null && body != null) {
@@ -303,12 +306,13 @@ public class ListFragment extends Fragment {
                             handler.sendEmptyMessage(NO_MORE);
                         }
                     }
+                } else {
+                    handler.sendEmptyMessage(STOP_REFRESH);
                 }
             }
 
             @Override
             public void onFailure(Call<GetListResponse> call, Throwable t) {
-                swipeRefresh.setRefreshing(false);
                 handler.sendEmptyMessage(NETWORK_FAIL);
             }
         });

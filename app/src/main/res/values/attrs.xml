@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="tool_bar">
+        <attr name="title_text" format="string" />
+        <attr name="show_subtitle" format="boolean" />
+        <attr name="subtitle_text" format="string" />
+        <attr name="bgColor" format="color" />
+        <attr name="title_bold" format="boolean" />
+        <attr name="back" format="boolean" />
+    </declare-styleable>
+</resources>

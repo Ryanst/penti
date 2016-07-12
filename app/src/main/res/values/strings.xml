@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">penti</string>
+    <string name="app_name">喷嚏网</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -10,4 +10,5 @@
     <string name="list_footer_loading">正在加载中…</string>
     <string name="list_footer_network_error">点击重新加载</string>
     <string name="list_footer_end">已经到底了</string>
+    <string name="empty" />
 </resources>

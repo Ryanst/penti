@@ -13,6 +13,7 @@ import com.ryanst.penti.core.MyApplication;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,11 +22,14 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.Interceptor;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Callback;
+import retrofit2.Converter;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -35,12 +39,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class NetClientAPI {
     public static final int OUT_TIME = 60;
 
-
     public static class NetConfig {
         public static final String HOST = "http://yuedu.163.com/";
     }
 
     private static RestInterface restService;
+    private static RestInterface restHtmlService;
 
     static {
         // 设置拦截器
@@ -92,9 +96,34 @@ public class NetClientAPI {
                 .addConverterFactory(buildGsonConverter())
 //                .addConverterFactory(GsonConverterFactory.create())
                 .build();
+
+        Retrofit retrofitHtml = new Retrofit.Builder()
+                .baseUrl(NetConfig.HOST)
+                .client(okHttpClient)
+                .addConverterFactory(new ToStringConverterFactory())
+                .build();
+
         restService = retrofit.create(RestInterface.class);
+
+        restHtmlService = retrofitHtml.create(RestInterface.class);
     }
 
+    public static class ToStringConverterFactory extends Converter.Factory {
+        private final MediaType MEDIA_TYPE = MediaType.parse("text/plain");
+
+        @Override
+        public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
+            if (String.class.equals(type)) {
+                return new Converter<ResponseBody, String>() {
+                    @Override
+                    public String convert(ResponseBody value) throws IOException {
+                        return value.string();
+                    }
+                };
+            }
+            return null;
+        }
+    }
 
     private static GsonConverterFactory buildGsonConverter() {
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -162,4 +191,14 @@ public class NetClientAPI {
 
         restService.getNewsList(request.getOperation(), request.getId(), request.getPageToken()).enqueue(callback);
     }
+
+    public static void getNewsHtml(String operation, String tuguaId, String contentId, Callback<String> callback) {
+        if (!NetWorkUtil.isConnected(MyApplication.getApplication())) {
+            callback.onResponse(null, null);
+            return;
+        }
+
+        restHtmlService.getNewsHtml(operation, tuguaId, contentId).enqueue(callback);
+    }
+
 }

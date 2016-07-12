@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="56dp"
+    android:background="@color/colorPrimary"
+    android:title="@string/empty">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center"
+            android:maxEms="8"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            tool:text="loading" />
+
+        <TextView
+            android:id="@+id/tv_sub_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="3dp"
+            android:gravity="center"
+            android:paddingBottom="5dp"
+            android:singleLine="true"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tool:text="副标题" />
+    </LinearLayout>
+</android.support.v7.widget.Toolbar>
+
