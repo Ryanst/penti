@@ -9,5 +9,5 @@ import retrofit2.http.Query;
  */
 public interface RestInterface {
     @GET("source.do")
-    Call<GetListResponse> getNewsList(@Query("operation") String operation, @Query("id") String id);
+    Call<GetListResponse> getNewsList(@Query("operation") String operation, @Query("id") String id, @Query("pageToken") String pageToken);
 }

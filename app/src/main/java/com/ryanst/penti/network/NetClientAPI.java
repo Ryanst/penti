@@ -160,6 +160,6 @@ public class NetClientAPI {
             return;
         }
 
-        restService.getNewsList(request.getOperation(), request.getId()).enqueue(callback);
+        restService.getNewsList(request.getOperation(), request.getId(), request.getPageToken()).enqueue(callback);
     }
 }
