@@ -100,7 +100,7 @@ public class NetClientAPI {
         Retrofit retrofitHtml = new Retrofit.Builder()
                 .baseUrl(NetConfig.HOST)
                 .client(okHttpClient)
-                .addConverterFactory(new ToStringConverterFactory())
+                .addConverterFactory(StringConverterFactory.create())
                 .build();
 
         restService = retrofit.create(RestInterface.class);
@@ -108,8 +108,14 @@ public class NetClientAPI {
         restHtmlService = retrofitHtml.create(RestInterface.class);
     }
 
-    public static class ToStringConverterFactory extends Converter.Factory {
+    public static class StringConverterFactory extends Converter.Factory {
         private final MediaType MEDIA_TYPE = MediaType.parse("text/plain");
+
+        private static final StringConverterFactory INSTANCE = new StringConverterFactory();
+
+        public static StringConverterFactory create() {
+            return INSTANCE;
+        }
 
         @Override
         public Converter<ResponseBody, ?> responseBodyConverter(Type type, Annotation[] annotations, Retrofit retrofit) {
