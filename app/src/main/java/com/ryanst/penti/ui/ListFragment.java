@@ -1,6 +1,5 @@
 package com.ryanst.penti.ui;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -13,11 +12,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.ryanst.penti.R;
 import com.ryanst.penti.adapter.NewsAdapter;
 import com.ryanst.penti.bean.News;
@@ -25,7 +21,6 @@ import com.ryanst.penti.core.BaseFragment;
 import com.ryanst.penti.network.GetListRequest;
 import com.ryanst.penti.network.GetListResponse;
 import com.ryanst.penti.network.NetClientAPI;
-import com.ryanst.penti.util.AndroidScreenUtil;
 import com.ryanst.penti.widget.DividerItemDecoration;
 import com.ryanst.penti.widget.recyclerview.EndlessRecyclerOnScrollListener;
 import com.ryanst.penti.widget.recyclerview.HeaderAndFooterRecyclerViewAdapter;
