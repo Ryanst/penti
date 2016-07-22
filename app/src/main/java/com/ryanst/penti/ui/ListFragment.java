@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.ryanst.penti.R;
+import com.ryanst.penti.adapter.NewsAdapter;
 import com.ryanst.penti.bean.News;
 import com.ryanst.penti.core.BaseFragment;
 import com.ryanst.penti.network.GetListRequest;
@@ -71,8 +72,8 @@ public class ListFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_list, null);
         ButterKnife.bind(this, view);
         initView();
-        initRecycleView();
         initData();
+        initRecycleView();
         return view;
     }
 
@@ -104,99 +105,7 @@ public class ListFragment extends BaseFragment {
         rvNewList.addItemDecoration(new RecyclerView.ItemDecoration() {
         });
 
-        adapter = new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-            private int TYPE_TEXT = 0;
-            private int TYPE_ONE_IMAGE = 1;
-            private int TYPE_THREE_IMAGES = 2;
-
-            @Override
-            public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-
-                if (viewType == TYPE_TEXT) {
-                    return new TextViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_news_text, parent, false));
-                } else if (viewType == TYPE_ONE_IMAGE) {
-                    return new OneImageViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_news_one_image, parent, false));
-                } else if (viewType == TYPE_THREE_IMAGES) {
-                    return new ThreeImagesViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_news_three_images, parent, false));
-                }
-                return new TextViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_news_text, parent, false));
-            }
-
-            @Override
-            public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-                View itemView = holder.itemView;
-                ((TextView) itemView.findViewById(R.id.tv_title)).setText(newsList.get(position).getTitle());
-                ((TextView) itemView.findViewById(R.id.tv_date)).setText(newsList.get(position).getPosttime());
-                itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        dealItemOnClick(position);
-                    }
-                });
-
-                if (holder instanceof OneImageViewHolder) {
-                    List<String> images = newsList.get(position).getImages();
-                    if (images != null && !images.isEmpty()) {
-
-                        ImageView imageView = (ImageView) itemView.findViewById(R.id.iv_image);
-
-                        ViewGroup.LayoutParams imageLayoutParam = imageView.getLayoutParams();
-                        int screenWidth = AndroidScreenUtil.getScreenMetrics(getActivity()).x;
-                        float density = AndroidScreenUtil.getScreenDensity(getActivity());
-                        int imageHeight = (int) ((double) (screenWidth - 32 * density) / 3);
-                        imageLayoutParam.height = imageHeight;
-                        imageView.setLayoutParams(imageLayoutParam);
-
-                        Glide.with(getContext()).load(images.get(0)).into(imageView);
-                    }
-                } else if (holder instanceof ThreeImagesViewHolder) {
-                    List<String> images = newsList.get(position).getImages();
-                    if (images != null && !images.isEmpty() && images.size() == 3) {
-                        ImageView imageView1 = (ImageView) itemView.findViewById(R.id.iv_image_1);
-                        ImageView imageView2 = (ImageView) itemView.findViewById(R.id.iv_image_2);
-                        ImageView imageView3 = (ImageView) itemView.findViewById(R.id.iv_image_3);
-
-                        ViewGroup.LayoutParams imageLayoutParam1 = imageView1.getLayoutParams();
-                        ViewGroup.LayoutParams imageLayoutParam2 = imageView2.getLayoutParams();
-                        ViewGroup.LayoutParams imageLayoutParam3 = imageView3.getLayoutParams();
-
-                        int screenWidth = AndroidScreenUtil.getScreenMetrics(getActivity()).x;
-                        float density = AndroidScreenUtil.getScreenDensity(getActivity());
-                        int imageHeight = (int) ((double) (screenWidth - 48 * density) / 3);
-                        imageLayoutParam1.height = imageHeight;
-                        imageLayoutParam2.height = imageHeight;
-                        imageLayoutParam3.height = imageHeight;
-
-                        imageView1.setLayoutParams(imageLayoutParam1);
-                        imageView2.setLayoutParams(imageLayoutParam2);
-                        imageView3.setLayoutParams(imageLayoutParam3);
-
-                        Glide.with(getContext()).load(images.get(0)).into(imageView1);
-                        Glide.with(getContext()).load(images.get(1)).into(imageView2);
-                        Glide.with(getContext()).load(images.get(2)).into(imageView3);
-                    }
-                }
-            }
-
-            @Override
-            public int getItemCount() {
-                return newsList.size();
-            }
-
-            @Override
-            public int getItemViewType(int position) {
-                List<String> images = newsList.get(position).getImages();
-                if (images == null || images.isEmpty()) {
-                    return TYPE_TEXT;
-                } else if (images.size() == 1) {
-                    return TYPE_ONE_IMAGE;
-                } else if (images.size() == 3) {
-                    return TYPE_THREE_IMAGES;
-                }
-                return TYPE_TEXT;
-            }
-        };
+        adapter = new NewsAdapter(getActivity(), newsList);
 
         loadMoreAdapter = new HeaderAndFooterRecyclerViewAdapter(adapter);
 
@@ -204,29 +113,6 @@ public class ListFragment extends BaseFragment {
         rvNewList.addOnScrollListener(mOnScrollListener);
     }
 
-    private static class TextViewHolder extends RecyclerView.ViewHolder {
-
-        public TextViewHolder(View itemView) {
-            super(itemView);
-        }
-
-    }
-
-    private static class OneImageViewHolder extends RecyclerView.ViewHolder {
-
-        public OneImageViewHolder(View itemView) {
-            super(itemView);
-        }
-
-    }
-
-    private static class ThreeImagesViewHolder extends RecyclerView.ViewHolder {
-
-        public ThreeImagesViewHolder(View itemView) {
-            super(itemView);
-        }
-
-    }
 
     private EndlessRecyclerOnScrollListener mOnScrollListener = new EndlessRecyclerOnScrollListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
         @Override
@@ -240,15 +126,6 @@ public class ListFragment extends BaseFragment {
             refresh(pageToken);
         }
     });
-
-    private void dealItemOnClick(int position) {
-//        Toast.makeText(getActivity(), "you press position: " + position, Toast.LENGTH_SHORT).show();
-
-        String contentId = newsList.get(position).getContentID();
-        Intent intent = new Intent(getActivity(), DetailNewsActivity.class);
-        intent.putExtra("contentId", contentId);
-        getActivity().startActivity(intent);
-    }
 
 
     private void initView() {
