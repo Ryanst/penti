@@ -8,7 +8,9 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ryanst.penti.R;
 import com.ryanst.penti.core.BaseActivity;
@@ -47,6 +49,12 @@ public class AboutActivity extends BaseActivity {
 
         toolbarLayout.setTitle(getResources().getString(R.string.about));
         toolbar.setNavigationIcon(R.drawable.back);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(AboutActivity.this, "稍完成后", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

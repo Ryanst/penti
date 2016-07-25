@@ -56,7 +56,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void finish() {
         super.finish();
-        overridePendingTransition(R.anim.anim_none, R.anim.anim_go_right);
+        overridePendingTransition(R.anim.anim_come, R.anim.anim_gone);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
