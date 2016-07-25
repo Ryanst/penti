@@ -8,6 +8,7 @@ import android.view.Gravity;
 
 import com.github.johnpersano.supertoasts.SuperToast;
 import com.orhanobut.logger.Logger;
+import com.ryanst.penti.R;
 import com.ryanst.penti.widget.CloseAllActivityEvent;
 import com.umeng.analytics.MobclickAgent;
 
@@ -50,6 +51,12 @@ public class BaseActivity extends AppCompatActivity {
         super.onPause();
         MobclickAgent.onPageEnd(this.getClass().getSimpleName());
         MobclickAgent.onPause(this);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(R.anim.anim_none, R.anim.anim_go_right);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
