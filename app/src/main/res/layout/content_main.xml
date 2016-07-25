@@ -8,10 +8,15 @@
     tools:context=".ui.MainActivity"
     tools:showIn="@layout/app_bar_main">
 
-    <fragment
-        android:id="@+id/fg_news_list"
-        android:name="com.ryanst.penti.ui.ListFragment"
+    <!--<fragment-->
+        <!--android:id="@+id/fg_news_list"-->
+        <!--android:name="com.ryanst.penti.ui.NewsListFragment"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"></fragment>-->
+
+    <FrameLayout
+        android:id="@+id/fl_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></fragment>
+        android:layout_height="match_parent"></FrameLayout>
 
 </RelativeLayout>

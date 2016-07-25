@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 import com.ryanst.penti.R;
+import com.ryanst.penti.constant.PentiConst;
 import com.ryanst.penti.core.BaseActivity;
 import com.ryanst.penti.network.NetClientAPI;
 import com.ryanst.penti.util.WebViewUtil;
@@ -29,9 +30,6 @@ public class DetailNewsActivity extends BaseActivity {
     MyWebView wbDetail;
     private String url;
 
-    private String tuguaId = "d1b01607-873f-400e-bd2f-332e5b9ce7f6_1";
-    private String pentiwang = "d1b01607-873f-400e-bd2f-332e5b9ce7f6_1";
-    private String baseUrl = "http://yuedu.163.com/source.do?operation=queryContentHtml";
     private String operation = "queryContentHtml";
     private String contentId;
     private HandlerThread handlerThread;
@@ -48,7 +46,7 @@ public class DetailNewsActivity extends BaseActivity {
 
     private void loadData() {
         Handler handler = new Handler(handlerThread.getLooper());
-        handler.post(runnable);
+        handler.post(loadHtmlRunnable);
     }
 
     private void initData() {
@@ -59,16 +57,16 @@ public class DetailNewsActivity extends BaseActivity {
     }
 
     private void getUrl() {
-        url = baseUrl;
-        url += "&" + "id=" + tuguaId;
+        url = PentiConst.BASE_URL;
+        url += "&" + "id=" + PentiConst.PENTI_WANG_ID;
         String contentId = getIntent().getStringExtra("contentId");
         url += "&" + "contentUuid=" + contentId;
     }
 
-    private Runnable runnable = new Runnable() {
+    private Runnable loadHtmlRunnable = new Runnable() {
         @Override
         public void run() {
-            loadNewsHtml(operation, tuguaId, contentId);
+            loadNewsHtml(operation, PentiConst.PENTI_WANG_ID, contentId);
         }
     };
 

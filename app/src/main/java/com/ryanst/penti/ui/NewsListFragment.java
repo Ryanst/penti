@@ -17,6 +17,7 @@ import android.widget.Toast;
 import com.ryanst.penti.R;
 import com.ryanst.penti.adapter.NewsAdapter;
 import com.ryanst.penti.bean.News;
+import com.ryanst.penti.constant.PentiConst;
 import com.ryanst.penti.core.BaseFragment;
 import com.ryanst.penti.network.GetListRequest;
 import com.ryanst.penti.network.GetListResponse;
@@ -39,7 +40,7 @@ import retrofit2.Response;
 /**
  * Created by zhengjuntong on 7/11/16.
  */
-public class ListFragment extends BaseFragment {
+public class NewsListFragment extends BaseFragment {
     public static final String QUERY_CONTENT_LIST = "queryContentList";
     public static final int PAGE_SIZE = 24;
     public static final int REFRESH = 1;
@@ -58,8 +59,14 @@ public class ListFragment extends BaseFragment {
     private RecyclerView.Adapter<RecyclerView.ViewHolder> adapter;
     private HeaderAndFooterRecyclerViewAdapter loadMoreAdapter = null;
     private boolean more = true;
-    private String tuguaId = "d1b01607-873f-400e-bd2f-332e5b9ce7f6_1";
-    private String baseUrl = "http://yuedu.163.com/source.do?operation=queryContentHtml";
+    private String typeId;
+    private String type;
+
+    public static NewsListFragment getInstance(String type) {
+        NewsListFragment fragment = new NewsListFragment();
+        fragment.setType(type);
+        return fragment;
+    }
 
     @Nullable
     @Override
@@ -80,10 +87,25 @@ public class ListFragment extends BaseFragment {
     };
 
     private void initData() {
+        initTypeId();
         newsList = new ArrayList<>();
         handlerThread = new HandlerThread("load_news_list");
         handlerThread.start();
         loadData();
+    }
+
+    private void initTypeId() {
+        switch (type) {
+            case PentiConst.FRAGMENT_TYPE_PENTI_WANG:
+                typeId = PentiConst.PENTI_WANG_ID;
+                break;
+            case PentiConst.FRAGMENT_TYPE_TUGUA:
+                typeId = PentiConst.TUGUA_ID;
+                break;
+            default:
+                typeId = PentiConst.PENTI_WANG_ID;
+                break;
+        }
     }
 
     private void loadData() {
@@ -158,7 +180,7 @@ public class ListFragment extends BaseFragment {
     private void refresh(final String pageToken) {
         GetListRequest request = new GetListRequest();
         request.setOperation(QUERY_CONTENT_LIST);
-        request.setId(tuguaId);
+        request.setId(typeId);
         request.setPageToken(pageToken);
 
         NetClientAPI.getNewsList(request, new Callback<GetListResponse>() {
@@ -168,8 +190,8 @@ public class ListFragment extends BaseFragment {
                     GetListResponse body = response.body();
                     if (response != null && body != null) {
                         newsList.addAll(body.getNewsList());
-                        ListFragment.this.pageToken = body.getMoreInfo().getNextPageToken();
-                        ListFragment.this.more = body.getMoreInfo().isMore();
+                        NewsListFragment.this.pageToken = body.getMoreInfo().getNextPageToken();
+                        NewsListFragment.this.more = body.getMoreInfo().isMore();
                         Log.d("CurrentThreadId", Thread.currentThread().getId() + "");
 
                         if (more) {
@@ -208,5 +230,13 @@ public class ListFragment extends BaseFragment {
         if (handlerThread != null && handlerThread.isAlive()) {
             handlerThread.quit();
         }
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

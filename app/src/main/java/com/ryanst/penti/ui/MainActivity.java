@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -14,19 +17,34 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.ryanst.penti.R;
+import com.ryanst.penti.constant.PentiConst;
 import com.ryanst.penti.core.BaseActivity;
+
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawer;
+    @BindView(R.id.fab)
+    FloatingActionButton fab;
+    @BindView(R.id.nav_view)
+    NavigationView navView;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -35,14 +53,60 @@ public class MainActivity extends BaseActivity
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.pentiwang, R.string.pentiwang);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navView.setNavigationItemSelectedListener(this);
+
+        fragmentManager = getSupportFragmentManager();
+        showFragment(PentiConst.FRAGMENT_TYPE_PENTI_WANG);
+    }
+
+    private void showFragment(String type) {
+
+        setMainTitle(type);
+
+        List<Fragment> fragments = fragmentManager.getFragments();
+        Fragment targetFragment = fragmentManager.findFragmentByTag(type);
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+
+        if (fragments != null && !fragments.isEmpty()) {
+            for (Fragment fragment : fragments) {
+                if (fragment != null) {
+                    transaction.hide(fragment);
+                }
+            }
+        }
+
+        transaction.commitAllowingStateLoss();
+
+        FragmentTransaction newTransaction = fragmentManager.beginTransaction();
+
+        if (targetFragment == null) {
+            targetFragment = NewsListFragment.getInstance(type);
+            newTransaction.add(R.id.fl_content, targetFragment, type);
+        } else {
+            newTransaction.show(targetFragment);
+        }
+
+        newTransaction.commitAllowingStateLoss();
+    }
+
+    private void setMainTitle(String type) {
+        switch (type) {
+            case PentiConst.FRAGMENT_TYPE_PENTI_WANG:
+                setTitle(PentiConst.PENTI_WANG);
+                break;
+            case PentiConst.FRAGMENT_TYPE_TUGUA:
+                setTitle(PentiConst.TUGUA);
+                break;
+            default:
+                setTitle(PentiConst.PENTI_WANG);
+                break;
+        }
     }
 
     @Override
@@ -71,7 +135,7 @@ public class MainActivity extends BaseActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-            
+
             return true;
         }
 
@@ -85,9 +149,9 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_tugua) {
-            // Handle the camera action
+            showFragment(PentiConst.FRAGMENT_TYPE_TUGUA);
         } else if (id == R.id.nav_pentiwang) {
-
+            showFragment(PentiConst.FRAGMENT_TYPE_PENTI_WANG);
         } else if (id == R.id.nav_setting) {
 
         } else if (id == R.id.nav_share) {
