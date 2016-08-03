@@ -3,7 +3,9 @@ package com.ryanst.penti.core;
 import android.app.Application;
 import android.content.Context;
 
+import com.github.moduth.blockcanary.BlockCanary;
 import com.ryanst.penti.BuildConfig;
+import com.ryanst.penti.widget.AppBlockCanaryContext;
 import com.ryanst.penti.widget.UCEHandler;
 
 import butterknife.ButterKnife;
@@ -19,6 +21,7 @@ public class MyApplication extends Application {
         super.onCreate();
         application = this;
         ButterKnife.setDebug(BuildConfig.DEBUG);
+        BlockCanary.install(this, new AppBlockCanaryContext()).start();
 //        initUncaughtException();
     }
 
