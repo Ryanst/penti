@@ -1,5 +1,6 @@
 package com.ryanst.penti.ui;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -9,12 +10,12 @@ import android.view.View;
 import com.ryanst.penti.R;
 import com.ryanst.penti.constant.PentiConst;
 import com.ryanst.penti.core.BaseActivity;
+import com.ryanst.penti.databinding.ActivityDetailNewsBinding;
 import com.ryanst.penti.network.NetClientAPI;
 import com.ryanst.penti.util.WebViewUtil;
 import com.ryanst.penti.widget.MyWebView;
 import com.ryanst.penti.widget.NavigationBar;
 
-import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -24,9 +25,7 @@ import retrofit2.Response;
  * Created by zhengjuntong on 7/12/16.
  */
 public class DetailNewsActivity extends BaseActivity {
-    @BindView(R.id.navBar)
     NavigationBar navBar;
-    @BindView(R.id.wb_detail)
     MyWebView wbDetail;
     private String url;
 
@@ -34,14 +33,31 @@ public class DetailNewsActivity extends BaseActivity {
     private String contentId;
     private HandlerThread handlerThread;
 
+    private ActivityDetailNewsBinding binding;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail_news);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_news);
         ButterKnife.bind(this);
-        initData();
         initView();
+        initData();
         loadData();
+    }
+
+    private void initView() {
+
+        navBar = binding.navBar;
+        wbDetail = binding.wbDetail;
+
+        navBar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
+        WebViewUtil.setWebViewSettings(wbDetail, null, null);
     }
 
     private void loadData() {
@@ -88,17 +104,6 @@ public class DetailNewsActivity extends BaseActivity {
     private void loadWebView(String htmlString) {
 //        wbDetail.loadData(htmlString, "text/html; charset=UTF-8", null);
         wbDetail.loadDataWithBaseURL(null, htmlString, "text/html", "UTF-8", null);
-    }
-
-    private void initView() {
-        navBar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-
-        WebViewUtil.setWebViewSettings(wbDetail, null, null);
     }
 
     @Override
