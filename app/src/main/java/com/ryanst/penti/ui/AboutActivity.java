@@ -31,15 +31,10 @@ public class AboutActivity extends BaseActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
 
-        binding.toolbarLayout.setTitle(getResources().getString(R.string.about));
-        binding.toolbar.setNavigationIcon(R.drawable.back);
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(AboutActivity.this, "稍完成后", Toast.LENGTH_SHORT).show();
-            }
-        });
+    public void fabOnClick(View view) {
+        Toast.makeText(AboutActivity.this, "稍完成后", Toast.LENGTH_SHORT).show();
     }
 
     @Override
