@@ -1,5 +1,6 @@
 package com.ryanst.penti.ui;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -19,6 +20,7 @@ import com.ryanst.penti.adapter.NewsAdapter;
 import com.ryanst.penti.bean.News;
 import com.ryanst.penti.constant.PentiConst;
 import com.ryanst.penti.core.BaseFragment;
+import com.ryanst.penti.databinding.FragmentNewsListBinding;
 import com.ryanst.penti.network.GetListRequest;
 import com.ryanst.penti.network.GetListResponse;
 import com.ryanst.penti.network.NetClientAPI;
@@ -31,8 +33,6 @@ import com.ryanst.penti.widget.recyclerview.RecyclerViewStateUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,11 +47,11 @@ public class NewsListFragment extends BaseFragment {
     public static final int NO_MORE = 2;
     public static final int NETWORK_FAIL = -1;
     public static final int STOP_REFRESH = 0;
-    @BindView(R.id.rv_new_list)
-    RecyclerView rvNewList;
 
-    @BindView(R.id.swipe_refresh)
-    SwipeRefreshLayout swipeRefresh;
+    private RecyclerView rvNewList;
+    private SwipeRefreshLayout swipeRefresh;
+
+    private FragmentNewsListBinding binding;
 
     private String pageToken;
     private HandlerThread handlerThread;
@@ -71,12 +71,11 @@ public class NewsListFragment extends BaseFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_list, null);
-        ButterKnife.bind(this, view);
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_news_list, container, false);
         initView();
         initData();
         initRecycleView();
-        return view;
+        return binding.getRoot();
     }
 
     private Runnable runnable = new Runnable() {
@@ -146,6 +145,8 @@ public class NewsListFragment extends BaseFragment {
 
 
     private void initView() {
+        rvNewList = binding.rvNewList;
+        swipeRefresh = binding.swipeRefresh;
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
