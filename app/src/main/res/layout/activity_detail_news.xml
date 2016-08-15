@@ -13,7 +13,15 @@
             android:layout_height="wrap_content"
             app:title_text="" />
 
-        <com.ryanst.penti.widget.MyWebView
+        <ProgressBar
+            android:id="@+id/web_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:max="100"
+            android:progressDrawable="@drawable/progress_bg" />
+
+        <WebView
             android:id="@+id/wb_detail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

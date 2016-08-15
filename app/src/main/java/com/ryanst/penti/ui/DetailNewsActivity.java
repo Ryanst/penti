@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.Nullable;
 import android.view.View;
+import android.webkit.WebView;
+import android.widget.ProgressBar;
 
 import com.ryanst.penti.R;
 import com.ryanst.penti.constant.PentiConst;
@@ -13,7 +15,6 @@ import com.ryanst.penti.core.BaseActivity;
 import com.ryanst.penti.databinding.ActivityDetailNewsBinding;
 import com.ryanst.penti.network.NetClientAPI;
 import com.ryanst.penti.util.WebViewUtil;
-import com.ryanst.penti.widget.MyWebView;
 import com.ryanst.penti.widget.NavigationBar;
 
 import butterknife.ButterKnife;
@@ -26,7 +27,7 @@ import retrofit2.Response;
  */
 public class DetailNewsActivity extends BaseActivity {
     NavigationBar navBar;
-    MyWebView wbDetail;
+    WebView wbDetail;
     private String url;
 
     private String operation = "queryContentHtml";
@@ -34,6 +35,7 @@ public class DetailNewsActivity extends BaseActivity {
     private HandlerThread handlerThread;
 
     private ActivityDetailNewsBinding binding;
+    private ProgressBar webProgress;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -49,6 +51,7 @@ public class DetailNewsActivity extends BaseActivity {
 
         navBar = binding.navBar;
         wbDetail = binding.wbDetail;
+        webProgress = binding.webProgress;
 
         navBar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,7 +60,23 @@ public class DetailNewsActivity extends BaseActivity {
             }
         });
 
-        WebViewUtil.setWebViewSettings(wbDetail, null, null);
+        WebViewUtil.setWebViewSettings(wbDetail, null, new WebViewUtil.ProgressBarListener() {
+            @Override
+            public void hideProgressBar(boolean hide, int progress) {
+                if (webProgress != null) {
+                    if (hide) {
+                        if (webProgress.getVisibility() != View.GONE) {
+                            webProgress.setVisibility(View.GONE);
+                        }
+                    } else {
+                        if (webProgress.getVisibility() != View.VISIBLE) {
+                            webProgress.setVisibility(View.VISIBLE);
+                        }
+                        webProgress.setProgress(progress);
+                    }
+                }
+            }
+        });
     }
 
     private void loadData() {

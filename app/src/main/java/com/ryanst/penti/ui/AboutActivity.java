@@ -1,6 +1,8 @@
 package com.ryanst.penti.ui;
 
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
@@ -34,7 +36,11 @@ public class AboutActivity extends BaseActivity {
     }
 
     public void fabOnClick(View view) {
-        Toast.makeText(AboutActivity.this, "稍完成后", Toast.LENGTH_SHORT).show();
+        Uri uri = Uri.parse(String.format(this.getString(R.string.market), this.getPackageName()));
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (intent.resolveActivity(this.getPackageManager()) != null)
+            this.startActivity(intent);
     }
 
     @Override

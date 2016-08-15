@@ -30,6 +30,7 @@ public class MainActivity extends BaseActivity
     private FragmentManager fragmentManager;
 
     ActivityMainBinding binding;
+    private String selectedType = PentiConst.FRAGMENT_TYPE_PENTI_WANG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +128,8 @@ public class MainActivity extends BaseActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_refresh) {
-
+            NewsListFragment fragment = (NewsListFragment) fragmentManager.findFragmentByTag(selectedType);
+            fragment.setRefresh();
             return true;
         }
 
@@ -141,12 +143,14 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_tugua) {
+            selectedType = PentiConst.FRAGMENT_TYPE_PENTI_WANG;
             showFragment(PentiConst.FRAGMENT_TYPE_TUGUA);
         } else if (id == R.id.nav_pentiwang) {
+            selectedType = PentiConst.FRAGMENT_TYPE_TUGUA;
             showFragment(PentiConst.FRAGMENT_TYPE_PENTI_WANG);
-        } else if (id == R.id.nav_setting) {
-
-        } else if (id == R.id.nav_share) {
+//        } else if (id == R.id.nav_setting) {
+//
+//        } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_about) {
             Intent intent = new Intent(this, AboutActivity.class);

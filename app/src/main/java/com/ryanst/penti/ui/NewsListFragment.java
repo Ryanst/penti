@@ -3,13 +3,12 @@ package com.ryanst.penti.ui;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,8 +53,8 @@ public class NewsListFragment extends BaseFragment {
     private FragmentNewsListBinding binding;
 
     private String pageToken;
-    private HandlerThread handlerThread;
-    private List<News> newsList;
+    private List<News> newsList = new ArrayList<>();
+    ;
     private RecyclerView.Adapter<RecyclerView.ViewHolder> adapter;
     private HeaderAndFooterRecyclerViewAdapter loadMoreAdapter = null;
     private boolean more = true;
@@ -73,24 +72,14 @@ public class NewsListFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_news_list, container, false);
         initView();
-        initData();
         initRecycleView();
+        initData();
         return binding.getRoot();
     }
 
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            refresh("");
-        }
-    };
-
     private void initData() {
         initTypeId();
-        newsList = new ArrayList<>();
-        handlerThread = new HandlerThread("load_news_list");
-        handlerThread.start();
-        loadData();
+        refresh("");
     }
 
     private void initTypeId() {
@@ -105,11 +94,6 @@ public class NewsListFragment extends BaseFragment {
                 typeId = PentiConst.PENTI_WANG_ID;
                 break;
         }
-    }
-
-    private void loadData() {
-        Handler handler = new Handler(handlerThread.getLooper());
-        handler.post(runnable);
     }
 
     private void initRecycleView() {
@@ -137,12 +121,15 @@ public class NewsListFragment extends BaseFragment {
             if (state == LoadingFooter.State.Loading || !more) {
                 return;
             }
-
             RecyclerViewStateUtils.setFooterViewState(getActivity(), rvNewList, PAGE_SIZE, LoadingFooter.State.Loading, null);
             refresh(pageToken);
         }
     });
 
+    public void setRefresh() {
+        swipeRefresh.setRefreshing(true);
+        refresh("");
+    }
 
     private void initView() {
         rvNewList = binding.rvNewList;
@@ -150,7 +137,7 @@ public class NewsListFragment extends BaseFragment {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                loadData();
+                refresh("");
             }
         });
     }
@@ -163,6 +150,8 @@ public class NewsListFragment extends BaseFragment {
             switch (msg.what) {
                 case REFRESH:
                     loadMoreAdapter.notifyDataSetChanged();
+                    rvNewList.smoothScrollToPosition(0);
+                    break;
                 case NO_MORE:
                     loadMoreAdapter.notifyDataSetChanged();
                     RecyclerViewStateUtils.setFooterViewState(rvNewList, LoadingFooter.State.TheEnd);
@@ -178,7 +167,7 @@ public class NewsListFragment extends BaseFragment {
         }
     };
 
-    private void refresh(final String pageToken) {
+    public void refresh(final String pageToken) {
         GetListRequest request = new GetListRequest();
         request.setOperation(QUERY_CONTENT_LIST);
         request.setId(typeId);
@@ -190,10 +179,14 @@ public class NewsListFragment extends BaseFragment {
                 if (response != null && response.body() != null) {
                     GetListResponse body = response.body();
                     if (response != null && body != null) {
+
+                        if (TextUtils.isEmpty(pageToken)) {
+                            newsList.clear();
+                        }
+
                         newsList.addAll(body.getNewsList());
                         NewsListFragment.this.pageToken = body.getMoreInfo().getNextPageToken();
                         NewsListFragment.this.more = body.getMoreInfo().isMore();
-                        Log.d("CurrentThreadId", Thread.currentThread().getId() + "");
 
                         if (more) {
                             handler.sendEmptyMessage(REFRESH);
@@ -224,14 +217,6 @@ public class NewsListFragment extends BaseFragment {
             }
         }
     };
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (handlerThread != null && handlerThread.isAlive()) {
-            handlerThread.quit();
-        }
-    }
 
     public String getType() {
         return type;
