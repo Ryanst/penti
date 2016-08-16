@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -33,6 +35,26 @@ public class AboutActivity extends BaseActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        initView();
+    }
+
+    private void initView() {
+
+        setTitle("关于");
+
+        CharSequence pentiwangLink =Html.fromHtml("<font color='#407FF3'><a href=\"http://www.dapenti.com\">dapenti.com</a></font>");
+        binding.contentAbout.tvPentiwang.setMovementMethod(LinkMovementMethod.getInstance());
+        binding.contentAbout.tvPentiwang.setText(pentiwangLink);
+
+        CharSequence githubLink = Html.fromHtml("<font color='#407FF3'><a href=\"http://www.github.com/Ryanst/penti\">www.github.com/Ryanst/penti</a></font>");
+        binding.contentAbout.tvPentiwang.setMovementMethod(LinkMovementMethod.getInstance());
+        binding.contentAbout.tvPentiGithub.setText(githubLink);
+
+        CharSequence zhengjtLink = Html.fromHtml("<font color='#407FF3'><a href=\"http://zhengjt.com\">zhengjt.com</a></font>");
+        binding.contentAbout.tvPentiwang.setMovementMethod(LinkMovementMethod.getInstance());
+        binding.contentAbout.tvZhengjtLink.setText(zhengjtLink);
+
     }
 
     public void fabOnClick(View view) {

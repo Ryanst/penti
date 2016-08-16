@@ -143,10 +143,10 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_tugua) {
-            selectedType = PentiConst.FRAGMENT_TYPE_PENTI_WANG;
+            selectedType = PentiConst.FRAGMENT_TYPE_TUGUA;
             showFragment(PentiConst.FRAGMENT_TYPE_TUGUA);
         } else if (id == R.id.nav_pentiwang) {
-            selectedType = PentiConst.FRAGMENT_TYPE_TUGUA;
+            selectedType = PentiConst.FRAGMENT_TYPE_PENTI_WANG;
             showFragment(PentiConst.FRAGMENT_TYPE_PENTI_WANG);
 //        } else if (id == R.id.nav_setting) {
 //
