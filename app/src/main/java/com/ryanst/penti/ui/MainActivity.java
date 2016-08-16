@@ -51,7 +51,7 @@ public class MainActivity extends BaseActivity
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.pentiwang, R.string.pentiwang);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         navView.setNavigationItemSelectedListener(this);

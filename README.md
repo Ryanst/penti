@@ -1,2 +1,2 @@
 # penti
-喷嚏网Android客户端,占坑,开发中
+喷嚏网非官方Android客户端
