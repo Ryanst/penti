@@ -43,7 +43,7 @@ public class NewsListFragment extends BaseFragment {
     public static final String QUERY_CONTENT_LIST = "queryContentList";
     public static final int PAGE_SIZE = 24;
     public static final int REFRESH = 1;
-    public static final int NO_MORE = 2;
+    private static final int LOAD_MORE = 2;
     public static final int NETWORK_FAIL = -1;
     public static final int STOP_REFRESH = 0;
 
@@ -54,8 +54,8 @@ public class NewsListFragment extends BaseFragment {
 
     private String pageToken;
     private List<News> newsList = new ArrayList<>();
-    ;
-    private RecyclerView.Adapter<RecyclerView.ViewHolder> adapter;
+
+    private NewsAdapter adapter;
     private HeaderAndFooterRecyclerViewAdapter loadMoreAdapter = null;
     private boolean more = true;
     private String typeId;
@@ -102,29 +102,24 @@ public class NewsListFragment extends BaseFragment {
 
         rvNewList.addItemDecoration(new DividerItemDecoration(getActivity()));
 
-        rvNewList.addItemDecoration(new RecyclerView.ItemDecoration() {
-        });
-
         adapter = new NewsAdapter(getActivity(), newsList);
 
         loadMoreAdapter = new HeaderAndFooterRecyclerViewAdapter(adapter);
 
-        rvNewList.setAdapter(loadMoreAdapter);
-        rvNewList.addOnScrollListener(mOnScrollListener);
+        rvNewList.setAdapter(adapter);
+        rvNewList.addOnScrollListener(new EndlessRecyclerOnScrollListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
+            @Override
+            public void onLoadNextPage(View view) {
+                LoadingFooter.State state = RecyclerViewStateUtils.getFooterViewState(rvNewList);
+                if (state == LoadingFooter.State.Loading || !more) {
+                    return;
+                }
+                RecyclerViewStateUtils.setFooterViewState(getActivity(), rvNewList, PAGE_SIZE, LoadingFooter.State.Loading, null);
+                refresh(pageToken);
+            }
+        }));
     }
 
-
-    private EndlessRecyclerOnScrollListener mOnScrollListener = new EndlessRecyclerOnScrollListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
-        @Override
-        public void onLoadNextPage(View view) {
-            LoadingFooter.State state = RecyclerViewStateUtils.getFooterViewState(rvNewList);
-            if (state == LoadingFooter.State.Loading || !more) {
-                return;
-            }
-            RecyclerViewStateUtils.setFooterViewState(getActivity(), rvNewList, PAGE_SIZE, LoadingFooter.State.Loading, null);
-            refresh(pageToken);
-        }
-    });
 
     public void setRefresh() {
         swipeRefresh.setRefreshing(true);
@@ -149,17 +144,28 @@ public class NewsListFragment extends BaseFragment {
             swipeRefresh.setRefreshing(false);
             switch (msg.what) {
                 case REFRESH:
-                    loadMoreAdapter.notifyDataSetChanged();
-                    rvNewList.smoothScrollToPosition(0);
+                    adapter.notifyDataSetChanged();
+//                    rvNewList.smoothScrollToPosition(0);
                     break;
-                case NO_MORE:
-                    loadMoreAdapter.notifyDataSetChanged();
-                    RecyclerViewStateUtils.setFooterViewState(rvNewList, LoadingFooter.State.TheEnd);
+                case LOAD_MORE:
+                    adapter.notifyDataSetChanged();
+                    RecyclerViewStateUtils.setFooterViewState(rvNewList, LoadingFooter.State.Normal);
                     break;
                 case NETWORK_FAIL:
-                    RecyclerViewStateUtils.setFooterViewState(getActivity(), rvNewList, PAGE_SIZE, LoadingFooter.State.NetWorkError, mFooterClick);
+                    RecyclerViewStateUtils.setFooterViewState(getActivity(), rvNewList, PAGE_SIZE, LoadingFooter.State.NetWorkError, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            if (more) {
+                                RecyclerViewStateUtils.setFooterViewState(getActivity(), rvNewList, PAGE_SIZE, LoadingFooter.State.Loading, null);
+                                refresh(pageToken);
+                            } else {
+                                Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_SHORT);
+                            }
+                        }
+                    });
                     break;
                 case STOP_REFRESH:
+                    RecyclerViewStateUtils.setFooterViewState(rvNewList, LoadingFooter.State.Normal);
                     break;
                 default:
                     break;
@@ -180,18 +186,15 @@ public class NewsListFragment extends BaseFragment {
                     GetListResponse body = response.body();
                     if (response != null && body != null) {
 
-                        if (TextUtils.isEmpty(pageToken)) {
-                            newsList.clear();
-                        }
-
-                        newsList.addAll(body.getNewsList());
                         NewsListFragment.this.pageToken = body.getMoreInfo().getNextPageToken();
                         NewsListFragment.this.more = body.getMoreInfo().isMore();
 
-                        if (more) {
+                        if (TextUtils.isEmpty(pageToken)) {
+                            newsList.clear();
+                            newsList.addAll(body.getNewsList());
                             handler.sendEmptyMessage(REFRESH);
                         } else {
-                            handler.sendEmptyMessage(NO_MORE);
+                            handler.sendEmptyMessage(LOAD_MORE);
                         }
                     }
                 } else {
@@ -205,18 +208,6 @@ public class NewsListFragment extends BaseFragment {
             }
         });
     }
-
-    private View.OnClickListener mFooterClick = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            if (more) {
-                RecyclerViewStateUtils.setFooterViewState(getActivity(), rvNewList, PAGE_SIZE, LoadingFooter.State.Loading, null);
-                refresh(pageToken);
-            } else {
-                Toast.makeText(getContext(), "没有更多了", Toast.LENGTH_SHORT);
-            }
-        }
-    };
 
     public String getType() {
         return type;
