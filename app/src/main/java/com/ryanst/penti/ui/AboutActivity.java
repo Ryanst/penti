@@ -41,18 +41,16 @@ public class AboutActivity extends BaseActivity {
 
     private void initView() {
 
-        setTitle("关于");
-
         CharSequence pentiwangLink =Html.fromHtml("<font color='#407FF3'><a href=\"http://www.dapenti.com\">dapenti.com</a></font>");
         binding.contentAbout.tvPentiwang.setMovementMethod(LinkMovementMethod.getInstance());
         binding.contentAbout.tvPentiwang.setText(pentiwangLink);
 
         CharSequence githubLink = Html.fromHtml("<font color='#407FF3'><a href=\"http://www.github.com/Ryanst/penti\">www.github.com/Ryanst/penti</a></font>");
-        binding.contentAbout.tvPentiwang.setMovementMethod(LinkMovementMethod.getInstance());
+        binding.contentAbout.tvPentiGithub.setMovementMethod(LinkMovementMethod.getInstance());
         binding.contentAbout.tvPentiGithub.setText(githubLink);
 
         CharSequence zhengjtLink = Html.fromHtml("<font color='#407FF3'><a href=\"http://zhengjt.com\">zhengjt.com</a></font>");
-        binding.contentAbout.tvPentiwang.setMovementMethod(LinkMovementMethod.getInstance());
+        binding.contentAbout.tvZhengjtLink.setMovementMethod(LinkMovementMethod.getInstance());
         binding.contentAbout.tvZhengjtLink.setText(zhengjtLink);
 
     }

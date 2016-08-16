@@ -31,7 +31,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="喷嚏网网址: "
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/sp_18" />
 
                 <TextView
                     android:linksClickable="true"
@@ -39,7 +39,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text=""
-                    android:textSize="16sp" />
+                    android:textSize="@dimen/sp_18" />
             </LinearLayout>
 
             <TextView
@@ -48,7 +48,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:text="喷嚏网：阅读、发现和分享：8小时外的健康生活！您的网络博客文摘，原创社会人文书评，每天只需5分钟的精神享受。来这儿打喷嚏！"
-                android:textSize="16sp" />
+                android:textSize="@dimen/sp_18" />
 
         <LinearLayout
             android:orientation="horizontal"
@@ -61,14 +61,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="项目地址: "
-                android:textSize="16sp" />
+                android:textSize="@dimen/sp_18" />
 
             <TextView
                 android:linksClickable="true"
                 android:id="@+id/tv_penti_github"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:text=""
                 android:textSize="16sp" />
             </LinearLayout>
@@ -84,15 +83,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="关于作者: "
-                android:textSize="16sp" />
+                android:textSize="@dimen/sp_18" />
             <TextView
                 android:linksClickable="true"
                 android:id="@+id/tv_zhengjt_link"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="16dp"
                 android:text=""
-                android:textSize="16sp" />
+                android:textSize="@dimen/sp_18" />
             </LinearLayout>
 
 
