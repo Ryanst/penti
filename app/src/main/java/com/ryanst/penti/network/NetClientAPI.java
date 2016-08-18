@@ -31,7 +31,9 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Callback;
 import retrofit2.Converter;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Observable;
 
 /**
  * Created by zhengjuntong on 16/5/7.
@@ -92,8 +94,8 @@ public class NetClientAPI {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(NetConfig.HOST)
                 .client(okHttpClient)
-//                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(buildGsonConverter())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
 //                .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -101,6 +103,7 @@ public class NetClientAPI {
                 .baseUrl(NetConfig.HOST)
                 .client(okHttpClient)
                 .addConverterFactory(StringConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
 
         restService = retrofit.create(RestInterface.class);
@@ -189,13 +192,8 @@ public class NetClientAPI {
         }
     }
 
-    public static void getNewsList(GetListRequest request, Callback<GetListResponse> callback) {
-        if (!NetWorkUtil.isConnected(MyApplication.getApplication())) {
-            callback.onResponse(null, null);
-            return;
-        }
-
-        restService.getNewsList(request.getOperation(), request.getId(), request.getPageToken()).enqueue(callback);
+    public static Observable<GetListResponse> getNewsList(GetListRequest request) {
+        return restService.getNewsList(request.getOperation(), request.getId(), request.getPageToken());
     }
 
     public static void getNewsHtml(String operation, String tuguaId, String contentId, Callback<String> callback) {
@@ -205,6 +203,10 @@ public class NetClientAPI {
         }
 
         restHtmlService.getNewsHtml(operation, tuguaId, contentId).enqueue(callback);
+    }
+
+    public static Observable<String> getNewsHtmlR(String operation, String tuguaId, String contentId) {
+        return restHtmlService.getNewsHtmlR(operation, tuguaId, contentId);
     }
 
 }

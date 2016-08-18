@@ -32,9 +32,9 @@ import com.ryanst.penti.widget.recyclerview.RecyclerViewStateUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Func1;
 
 /**
  * Created by zhengjuntong on 7/11/16.
@@ -174,38 +174,46 @@ public class NewsListFragment extends BaseFragment {
     };
 
     public void refresh(final String pageToken) {
-        GetListRequest request = new GetListRequest();
+        final GetListRequest request = new GetListRequest();
         request.setOperation(QUERY_CONTENT_LIST);
         request.setId(typeId);
         request.setPageToken(pageToken);
 
-        NetClientAPI.getNewsList(request, new Callback<GetListResponse>() {
-            @Override
-            public void onResponse(Call<GetListResponse> call, Response<GetListResponse> response) {
-                if (response != null && response.body() != null) {
-                    GetListResponse body = response.body();
-                    if (response != null && body != null) {
-
-                        NewsListFragment.this.pageToken = body.getMoreInfo().getNextPageToken();
-                        NewsListFragment.this.more = body.getMoreInfo().isMore();
-
-                        if (TextUtils.isEmpty(pageToken)) {
-                            newsList.clear();
-                            newsList.addAll(body.getNewsList());
-                            handler.sendEmptyMessage(REFRESH);
-                        } else {
-                            newsList.addAll(body.getNewsList());
-                            handler.sendEmptyMessage(LOAD_MORE);
-                        }
+        Observable.just(null)
+                .flatMap(new Func1<Object, Observable<GetListResponse>>() {
+                    @Override
+                    public Observable<GetListResponse> call(Object o) {
+                        return NetClientAPI.getNewsList(request);
                     }
-                } else {
-                    handler.sendEmptyMessage(STOP_REFRESH);
-                }
+                }).subscribe(new Subscriber<GetListResponse>() {
+            @Override
+            public void onCompleted() {
+
             }
 
             @Override
-            public void onFailure(Call<GetListResponse> call, Throwable t) {
+            public void onError(Throwable e) {
                 handler.sendEmptyMessage(NETWORK_FAIL);
+            }
+
+            @Override
+            public void onNext(GetListResponse response) {
+                if (response != null) {
+                    NewsListFragment.this.pageToken = response.getMoreInfo().getNextPageToken();
+                    NewsListFragment.this.more = response.getMoreInfo().isMore();
+
+                    if (TextUtils.isEmpty(pageToken)) {
+                        newsList.clear();
+                        newsList.addAll(response.getNewsList());
+                        handler.sendEmptyMessage(REFRESH);
+                    } else {
+                        newsList.addAll(response.getNewsList());
+                        handler.sendEmptyMessage(LOAD_MORE);
+                    }
+
+                } else {
+                    handler.sendEmptyMessage(STOP_REFRESH);
+                }
             }
         });
     }

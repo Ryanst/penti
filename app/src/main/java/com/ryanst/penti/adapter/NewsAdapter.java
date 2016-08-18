@@ -14,6 +14,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding.view.RxView;
 import com.ryanst.penti.BR;
 import com.ryanst.penti.R;
 import com.ryanst.penti.bean.News;
@@ -21,6 +22,8 @@ import com.ryanst.penti.ui.DetailNewsActivity;
 import com.ryanst.penti.util.AndroidScreenUtil;
 
 import java.util.List;
+
+import rx.functions.Action1;
 
 /**
  * Created by zhengjuntong on 7/22/16.
@@ -81,9 +84,10 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         View itemView = holder.itemView;
 
-        itemView.setOnClickListener(new View.OnClickListener() {
+        RxView.clicks(itemView)
+                .subscribe(new Action1<Void>() {
             @Override
-            public void onClick(View view) {
+            public void call(Void aVoid) {
                 dealItemOnClick(position);
             }
         });

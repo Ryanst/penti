@@ -21,6 +21,9 @@ import butterknife.ButterKnife;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Func1;
 
 /**
  * Created by zhengjuntong on 7/12/16.
@@ -105,17 +108,30 @@ public class DetailNewsActivity extends BaseActivity {
         }
     };
 
-    private void loadNewsHtml(String operation, String tuguaId, String contentId) {
-        NetClientAPI.getNewsHtml(operation, tuguaId, contentId, new Callback<String>() {
+
+
+    private void loadNewsHtml(final String operation, final String tuguaId, final String contentId) {
+
+        Observable.just(null)
+                .flatMap(new Func1<Object, Observable<String>>() {
+                    @Override
+                    public Observable<String> call(Object o) {
+                        return NetClientAPI.getNewsHtmlR(operation, tuguaId, contentId);
+                    }
+                }).subscribe(new Subscriber<String>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                String htmlString = response.body();
-                loadWebView(htmlString);
+            public void onCompleted() {
+
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onError(Throwable e) {
+                toast(getString(R.string.network_error));
+            }
 
+            @Override
+            public void onNext(String s) {
+                loadWebView(s);
             }
         });
     }
