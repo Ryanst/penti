@@ -12,10 +12,12 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.ryanst.penti.BR;
 import com.ryanst.penti.R;
 import com.ryanst.penti.bean.News;
+import com.ryanst.penti.databinding.ItemNewsTextBinding;
 import com.ryanst.penti.ui.DetailNewsActivity;
 import com.ryanst.penti.util.AndroidScreenUtil;
 
@@ -33,8 +35,6 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int TYPE_THREE_IMAGES = 2;
     private int lastPosition = -1;
 
-    private ViewDataBinding binding;
-
     public NewsAdapter(Activity activity, List<News> newsList) {
         this.activity = activity;
         this.newsList = newsList;
@@ -43,16 +43,20 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
+        TextViewHolder holder;
+        ViewDataBinding binding;
+
         if (viewType == TYPE_ONE_IMAGE) {
             binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_news_one_image, parent, false);
-            return new TextViewHolder(binding.getRoot());
         } else if (viewType == TYPE_THREE_IMAGES) {
             binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_news_three_images, parent, false);
-            return new OneImageViewHolder(binding.getRoot());
         } else {
             binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_news_text, parent, false);
-            return new ThreeImagesViewHolder(binding.getRoot());
         }
+
+        holder = new TextViewHolder(binding.getRoot());
+        holder.setBinding(binding);
+        return holder;
     }
 
     private void setAnimation(View viewToAnimate, int position) {
@@ -72,6 +76,10 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
+
+        TextView title = (TextView)holder.itemView.findViewById(R.id.tv_title);
+        title.setText(newsList.get(position).getTitle());
+
         View itemView = holder.itemView;
 
         itemView.setOnClickListener(new View.OnClickListener() {
@@ -84,6 +92,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         int itemViewType = getItemViewType(position);
         News news = newsList.get(position);
         List<String> images = news.getImages();
+
         switch (itemViewType) {
             case TYPE_TEXT:
                 break;
@@ -127,10 +136,9 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 break;
         }
 
+        ((TextViewHolder) holder).getBinding().setVariable(BR.news, newsList.get(position));
         CardView cardView = (CardView) holder.itemView.getRootView().findViewById(R.id.cardView);
         setAnimation(cardView, position);
-        binding.setVariable(BR.news, news);
-        binding.executePendingBindings();
     }
 
     @Override
@@ -162,26 +170,30 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     }
 
     private static class TextViewHolder extends RecyclerView.ViewHolder {
+        ViewDataBinding binding;
 
         public TextViewHolder(View itemView) {
             super(itemView);
         }
 
+        public ViewDataBinding getBinding() {
+            return binding;
+        }
+
+        public void setBinding(ViewDataBinding binding) {
+            this.binding = binding;
+        }
     }
 
     private static class OneImageViewHolder extends RecyclerView.ViewHolder {
-
         public OneImageViewHolder(View itemView) {
             super(itemView);
         }
-
     }
 
     private static class ThreeImagesViewHolder extends RecyclerView.ViewHolder {
-
         public ThreeImagesViewHolder(View itemView) {
             super(itemView);
         }
-
     }
 }

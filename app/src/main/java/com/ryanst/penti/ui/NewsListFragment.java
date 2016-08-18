@@ -106,7 +106,7 @@ public class NewsListFragment extends BaseFragment {
 
         loadMoreAdapter = new HeaderAndFooterRecyclerViewAdapter(adapter);
 
-        rvNewList.setAdapter(adapter);
+        rvNewList.setAdapter(loadMoreAdapter);
         rvNewList.addOnScrollListener(new EndlessRecyclerOnScrollListener(new EndlessRecyclerOnScrollListener.OnListLoadNextPageListener() {
             @Override
             public void onLoadNextPage(View view) {
@@ -144,11 +144,11 @@ public class NewsListFragment extends BaseFragment {
             swipeRefresh.setRefreshing(false);
             switch (msg.what) {
                 case REFRESH:
-                    adapter.notifyDataSetChanged();
-//                    rvNewList.smoothScrollToPosition(0);
+                    loadMoreAdapter.notifyDataSetChanged();
+                    rvNewList.smoothScrollToPosition(0);
                     break;
                 case LOAD_MORE:
-                    adapter.notifyDataSetChanged();
+                    loadMoreAdapter.notifyDataSetChanged();
                     RecyclerViewStateUtils.setFooterViewState(rvNewList, LoadingFooter.State.Normal);
                     break;
                 case NETWORK_FAIL:
@@ -194,6 +194,7 @@ public class NewsListFragment extends BaseFragment {
                             newsList.addAll(body.getNewsList());
                             handler.sendEmptyMessage(REFRESH);
                         } else {
+                            newsList.addAll(body.getNewsList());
                             handler.sendEmptyMessage(LOAD_MORE);
                         }
                     }
