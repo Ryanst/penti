@@ -17,7 +17,6 @@ import android.widget.TextView;
 import com.ryanst.penti.BR;
 import com.ryanst.penti.R;
 import com.ryanst.penti.bean.News;
-import com.ryanst.penti.databinding.ItemNewsTextBinding;
 import com.ryanst.penti.ui.DetailNewsActivity;
 import com.ryanst.penti.util.AndroidScreenUtil;
 
@@ -43,7 +42,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        TextViewHolder holder;
+        NewsItemHolder holder;
         ViewDataBinding binding;
 
         if (viewType == TYPE_ONE_IMAGE) {
@@ -54,7 +53,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.item_news_text, parent, false);
         }
 
-        holder = new TextViewHolder(binding.getRoot());
+        holder = new NewsItemHolder(binding.getRoot());
         holder.setBinding(binding);
         return holder;
     }
@@ -136,7 +135,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 break;
         }
 
-        ((TextViewHolder) holder).getBinding().setVariable(BR.news, newsList.get(position));
+        ((NewsItemHolder) holder).getBinding().setVariable(BR.news, newsList.get(position));
         CardView cardView = (CardView) holder.itemView.getRootView().findViewById(R.id.cardView);
         setAnimation(cardView, position);
     }
@@ -169,10 +168,10 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         activity.startActivity(intent);
     }
 
-    private static class TextViewHolder extends RecyclerView.ViewHolder {
+    private static class NewsItemHolder extends RecyclerView.ViewHolder {
         ViewDataBinding binding;
 
-        public TextViewHolder(View itemView) {
+        public NewsItemHolder(View itemView) {
             super(itemView);
         }
 
