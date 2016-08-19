@@ -33,8 +33,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by zhengjuntong on 7/11/16.
@@ -185,7 +188,10 @@ public class NewsListFragment extends BaseFragment {
                     public Observable<GetListResponse> call(Object o) {
                         return NetClientAPI.getNewsList(request);
                     }
-                }).subscribe(new Subscriber<GetListResponse>() {
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<GetListResponse>() {
             @Override
             public void onCompleted() {
 

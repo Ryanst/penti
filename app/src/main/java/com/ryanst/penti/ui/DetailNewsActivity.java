@@ -23,7 +23,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by zhengjuntong on 7/12/16.
@@ -118,7 +120,10 @@ public class DetailNewsActivity extends BaseActivity {
                     public Observable<String> call(Object o) {
                         return NetClientAPI.getNewsHtmlR(operation, tuguaId, contentId);
                     }
-                }).subscribe(new Subscriber<String>() {
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<String>() {
             @Override
             public void onCompleted() {
 

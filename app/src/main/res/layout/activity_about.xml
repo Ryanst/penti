@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/fab_margin"
             android:onClick="fabOnClick"
-            android:src="@mipmap/ic_thumb_up"
+            android:src="@drawable/ic_thumb_up"
             app:layout_anchor="@id/app_bar"
             app:layout_anchorGravity="bottom|end" />
 
