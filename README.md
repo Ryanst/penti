@@ -3,10 +3,10 @@
 
 效果图：
 
-![列表](https://github.com/Ryanst/blob/master/penti/images/penti_list.gif)
+![列表](https://github.com/Ryanst/penti/blob/master/images/penti_list.gif)
 
 
-![详情页](https://github.com/Ryanst/blob/master/penti/images/penti_detail.gif)
+![详情页](https://github.com/Ryanst/penti/blob/master/images/penti_detail.gif)
 
 - RxJava+Retrofit+Okhttp完成自定义网络请求
 - Gson格式自定义处理
