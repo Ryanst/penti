@@ -18,7 +18,7 @@ import com.umeng.analytics.MobclickAgent;
  */
 public class BaseFragment extends Fragment {
 
-    private SuperToast superToast;
+    private SuperToast toast;
 
     protected Context context;
 
@@ -29,12 +29,24 @@ public class BaseFragment extends Fragment {
     }
 
     protected void toast(String message) {
-        if (superToast == null) {
-            superToast = SuperToast.create(getActivity(), message, 1000);
-            superToast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
+        toast(message,2000);
+    }
+
+    protected void toastShort(String message) {
+        toast(message,1000);
+    }
+
+    protected void toastLong(String message) {
+        toast(message,4000);
+    }
+
+    protected void toast(String message, int duration ) {
+        if (toast == null) {
+            toast = SuperToast.create(MyApplication.getApplication(), message, duration);
+            toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
         }
-        superToast.setText(message);
-        superToast.show();
+        toast.setText(message);
+        toast.show();
     }
 
     @Override

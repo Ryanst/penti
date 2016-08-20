@@ -21,7 +21,6 @@ import org.greenrobot.eventbus.ThreadMode;
  * Created by zhengjuntong on 7/11/16.
  */
 
-
 public class BaseActivity extends AppCompatActivity {
 
     private SuperToast toast;
@@ -65,8 +64,20 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     protected void toast(String message) {
+        toast(message,2000);
+    }
+
+    protected void toastShort(String message) {
+        toast(message,1000);
+    }
+
+    protected void toastLong(String message) {
+        toast(message,4000);
+    }
+
+    protected void toast(String message, int duration ) {
         if (toast == null) {
-            toast = SuperToast.create(this, message, 1000);
+            toast = SuperToast.create(this, message, duration);
             toast.setGravity(Gravity.CENTER_VERTICAL, 0, 0);
         }
         toast.setText(message);
