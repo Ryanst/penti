@@ -3,10 +3,15 @@ package com.ryanst.penti.core;
 import android.app.Application;
 import android.content.Context;
 
+import com.facebook.stetho.Stetho;
 import com.github.moduth.blockcanary.BlockCanary;
+import com.orhanobut.logger.LogLevel;
 import com.ryanst.penti.BuildConfig;
+import com.ryanst.penti.util.StrictModeUtil;
 import com.ryanst.penti.widget.AppBlockCanaryContext;
 import com.ryanst.penti.widget.UCEHandler;
+
+import java.util.logging.Logger;
 
 import butterknife.ButterKnife;
 
@@ -19,9 +24,21 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
         application = this;
+
+        StrictModeUtil.init();
+
         ButterKnife.setDebug(BuildConfig.DEBUG);
+
         BlockCanary.install(this, new AppBlockCanaryContext()).start();
+
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(this)
+                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                        .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
+                        .build());
+
 //        initUncaughtException();
     }
 
