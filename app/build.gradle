@@ -2,13 +2,13 @@ apply plugin: 'com.android.application'
 apply plugin: 'android-apt'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "com.ryanst.penti"
         minSdkVersion 17
-        targetSdkVersion 24
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
     }
@@ -78,7 +78,7 @@ android {
     }
 
     ext {
-        supportLibVersion = '24.0.0'
+        supportLibVersion = '23.3.0'
         retrofitLibVersion = '2.1.0'
     }
 

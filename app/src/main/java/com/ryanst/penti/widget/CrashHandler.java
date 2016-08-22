@@ -7,22 +7,21 @@ import android.content.Intent;
 import android.os.Looper;
 import android.widget.Toast;
 
-import com.ryanst.penti.core.MyApplication;
-import com.ryanst.penti.ui.MainActivity;
+import com.facebook.stetho.common.LogUtil;
 
 
 /**
  * Created by zhengjuntong on 15/11/19.
  */
-public class UCEHandler implements Thread.UncaughtExceptionHandler {
+public class CrashHandler implements Thread.UncaughtExceptionHandler {
     private Thread.UncaughtExceptionHandler mDefaultHandler;
-    public static final String TAG = "CatchExcep";
-    MyApplication application;
 
-    public UCEHandler(MyApplication application) {
+    Context applicationContext;
+
+    public CrashHandler(Context applicationContext) {
         //获取系统默认的UncaughtException处理器
         mDefaultHandler = Thread.getDefaultUncaughtExceptionHandler();
-        this.application = application;
+        this.applicationContext = applicationContext;
     }
 
     @Override
@@ -31,19 +30,20 @@ public class UCEHandler implements Thread.UncaughtExceptionHandler {
             //如果用户没有处理则让系统默认的异常处理器来处理
             mDefaultHandler.uncaughtException(thread, ex);
         } else {
+            Intent intent = applicationContext.getPackageManager().getLaunchIntentForPackage(applicationContext.getPackageName());
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent restartIntent = PendingIntent.getActivity(applicationContext.getApplicationContext(), 100, intent, PendingIntent.FLAG_ONE_SHOT);
+
+            //退出程序
+            AlarmManager mgr = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
+            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, restartIntent); // 1秒钟后重启应用
+            System.exit(0);
+
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
+                LogUtil.e("error : ", e);
             }
-            Intent intent = new Intent(application.getApplicationContext(), MainActivity.class);
-            PendingIntent restartIntent = PendingIntent.getActivity(
-                    application.getApplicationContext(), 100,
-                    intent, Intent.FLAG_ACTIVITY_NEW_TASK);
-            //退出程序
-            AlarmManager mgr = (AlarmManager) application.getSystemService(Context.ALARM_SERVICE);
-            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 500,
-                    restartIntent); // 1秒钟后重启应用
-            System.exit(0);
         }
     }
 
@@ -62,7 +62,7 @@ public class UCEHandler implements Thread.UncaughtExceptionHandler {
             @Override
             public void run() {
                 Looper.prepare();
-                Toast.makeText(application.getApplicationContext(), "异常退出", Toast.LENGTH_LONG).show();
+                Toast.makeText(applicationContext.getApplicationContext(), "异常退出", Toast.LENGTH_LONG).show();
                 Looper.loop();
             }
         }.start();

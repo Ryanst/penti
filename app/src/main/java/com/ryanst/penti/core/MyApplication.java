@@ -5,13 +5,10 @@ import android.content.Context;
 
 import com.facebook.stetho.Stetho;
 import com.github.moduth.blockcanary.BlockCanary;
-import com.orhanobut.logger.LogLevel;
 import com.ryanst.penti.BuildConfig;
 import com.ryanst.penti.util.StrictModeUtil;
 import com.ryanst.penti.widget.AppBlockCanaryContext;
-import com.ryanst.penti.widget.UCEHandler;
-
-import java.util.logging.Logger;
+import com.ryanst.penti.widget.CrashHandler;
 
 import butterknife.ButterKnife;
 
@@ -49,7 +46,7 @@ public class MyApplication extends Application {
 
     public void initUncaughtException() {
         //设置该CrashHandler为程序的默认处理器
-        UCEHandler uceHandler = new UCEHandler(this);
+        CrashHandler uceHandler = new CrashHandler(this);
         Thread.setDefaultUncaughtExceptionHandler(uceHandler);
     }
 }
