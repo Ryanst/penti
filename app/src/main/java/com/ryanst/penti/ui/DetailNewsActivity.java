@@ -111,34 +111,27 @@ public class DetailNewsActivity extends BaseActivity {
     };
 
 
-
     private void loadNewsHtml(final String operation, final String tuguaId, final String contentId) {
 
-        Observable.just(null)
-                .flatMap(new Func1<Object, Observable<String>>() {
-                    @Override
-                    public Observable<String> call(Object o) {
-                        return NetClientAPI.getNewsHtmlR(operation, tuguaId, contentId);
-                    }
-                })
+        NetClientAPI.getNewsHtmlR(operation, tuguaId, contentId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<String>() {
-            @Override
-            public void onCompleted() {
+                    @Override
+                    public void onCompleted() {
 
-            }
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                toast(getString(R.string.network_error));
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                        toast(getString(R.string.network_error));
+                    }
 
-            @Override
-            public void onNext(String s) {
-                loadWebView(s);
-            }
-        });
+                    @Override
+                    public void onNext(String s) {
+                        loadWebView(s);
+                    }
+                });
     }
 
     private void loadWebView(String htmlString) {

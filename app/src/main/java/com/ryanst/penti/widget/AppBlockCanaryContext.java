@@ -41,7 +41,7 @@ public class AppBlockCanaryContext extends BlockCanaryContext {
 
     @Override
     public String getUid() {
-        return "87224330";
+        return "1000000";
     }
 
     @Override

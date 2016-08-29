@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
-import rx.Scheduler;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -182,46 +181,40 @@ public class NewsListFragment extends BaseFragment {
         request.setId(typeId);
         request.setPageToken(pageToken);
 
-        Observable.just(null)
-                .flatMap(new Func1<Object, Observable<GetListResponse>>() {
-                    @Override
-                    public Observable<GetListResponse> call(Object o) {
-                        return NetClientAPI.getNewsList(request);
-                    }
-                })
+        NetClientAPI.getNewsList(request)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<GetListResponse>() {
-            @Override
-            public void onCompleted() {
+                    @Override
+                    public void onCompleted() {
 
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                handler.sendEmptyMessage(NETWORK_FAIL);
-            }
-
-            @Override
-            public void onNext(GetListResponse response) {
-                if (response != null) {
-                    NewsListFragment.this.pageToken = response.getMoreInfo().getNextPageToken();
-                    NewsListFragment.this.more = response.getMoreInfo().isMore();
-
-                    if (TextUtils.isEmpty(pageToken)) {
-                        newsList.clear();
-                        newsList.addAll(response.getNewsList());
-                        handler.sendEmptyMessage(REFRESH);
-                    } else {
-                        newsList.addAll(response.getNewsList());
-                        handler.sendEmptyMessage(LOAD_MORE);
                     }
 
-                } else {
-                    handler.sendEmptyMessage(STOP_REFRESH);
-                }
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+                        handler.sendEmptyMessage(NETWORK_FAIL);
+                    }
+
+                    @Override
+                    public void onNext(GetListResponse response) {
+                        if (response != null) {
+                            NewsListFragment.this.pageToken = response.getMoreInfo().getNextPageToken();
+                            NewsListFragment.this.more = response.getMoreInfo().isMore();
+
+                            if (TextUtils.isEmpty(pageToken)) {
+                                newsList.clear();
+                                newsList.addAll(response.getNewsList());
+                                handler.sendEmptyMessage(REFRESH);
+                            } else {
+                                newsList.addAll(response.getNewsList());
+                                handler.sendEmptyMessage(LOAD_MORE);
+                            }
+
+                        } else {
+                            handler.sendEmptyMessage(STOP_REFRESH);
+                        }
+                    }
+                });
     }
 
     public String getType() {
