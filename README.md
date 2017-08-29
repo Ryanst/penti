@@ -7,7 +7,7 @@
 - Glide图片异步加载和缓存
 - MVVM架构：Databinding实现
 - RecyclerView加载动画和加载更多
-- Blockcanary检测内存泄露
+- Blockcanary检测 UI 卡顿
 - Metrial Degisn 风格设计
 
 效果图：
