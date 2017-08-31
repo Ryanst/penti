@@ -40,7 +40,7 @@
                 android:max="100"
                 android:progressDrawable="@drawable/progress_bg"/>
 
-            <WebView
+            <com.ryanst.penti.widget.NestedWebView
                 android:id="@+id/wb_detail"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>
