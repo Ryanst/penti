@@ -5,12 +5,9 @@ import android.content.Context;
 
 import com.facebook.stetho.Stetho;
 import com.github.moduth.blockcanary.BlockCanary;
-import com.ryanst.penti.BuildConfig;
 import com.ryanst.penti.util.StrictModeUtil;
 import com.ryanst.penti.widget.AppBlockCanaryContext;
 import com.ryanst.penti.widget.CrashHandler;
-
-import butterknife.ButterKnife;
 
 /**
  * Created by zhengjuntong on 7/11/16.
@@ -25,8 +22,6 @@ public class MyApplication extends Application {
         application = this;
 
         StrictModeUtil.init();
-
-        ButterKnife.setDebug(BuildConfig.DEBUG);
 
         BlockCanary.install(this, new AppBlockCanaryContext()).start();
 

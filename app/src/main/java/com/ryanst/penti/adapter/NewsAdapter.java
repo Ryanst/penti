@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -31,15 +32,17 @@ import rx.functions.Action1;
 public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final Activity activity;
+    private String type;
     private List<News> newsList;
     private final int TYPE_TEXT = 0;
     private final int TYPE_ONE_IMAGE = 1;
     private final int TYPE_THREE_IMAGES = 2;
     private int lastPosition = -1;
 
-    public NewsAdapter(Activity activity, List<News> newsList) {
+    public NewsAdapter(FragmentActivity activity, List<News> newsList, String type) {
         this.activity = activity;
         this.newsList = newsList;
+        this.type = type;
     }
 
     @Override
@@ -79,18 +82,18 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
 
-        TextView title = (TextView)holder.itemView.findViewById(R.id.tv_title);
+        TextView title = (TextView) holder.itemView.findViewById(R.id.tv_title);
         title.setText(newsList.get(position).getTitle());
 
         View itemView = holder.itemView;
 
         RxView.clicks(itemView)
                 .subscribe(new Action1<Void>() {
-            @Override
-            public void call(Void aVoid) {
-                dealItemOnClick(position);
-            }
-        });
+                    @Override
+                    public void call(Void aVoid) {
+                        dealItemOnClick(position);
+                    }
+                });
 
         int itemViewType = getItemViewType(position);
         News news = newsList.get(position);
@@ -169,6 +172,7 @@ public class NewsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         String contentId = newsList.get(position).getContentID();
         Intent intent = new Intent(activity, DetailNewsActivity.class);
         intent.putExtra("contentId", contentId);
+        intent.putExtra("type", type);
         activity.startActivity(intent);
     }
 

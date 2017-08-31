@@ -15,25 +15,19 @@ import com.ryanst.penti.core.BaseActivity;
 import com.ryanst.penti.databinding.ActivityDetailNewsBinding;
 import com.ryanst.penti.network.NetClientAPI;
 import com.ryanst.penti.util.WebViewUtil;
-import com.ryanst.penti.widget.NavigationBar;
 
-import butterknife.ButterKnife;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+
+import static com.ryanst.penti.constant.PentiConst.PENTI_WANG;
+import static com.ryanst.penti.constant.PentiConst.TUGUA;
 
 /**
  * Created by zhengjuntong on 7/12/16.
  */
 public class DetailNewsActivity extends BaseActivity {
-    NavigationBar navBar;
     WebView wbDetail;
-    private String url;
 
     private String operation = "queryContentHtml";
     private String contentId;
@@ -46,7 +40,7 @@ public class DetailNewsActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_detail_news);
-        ButterKnife.bind(this);
+        setSupportActionBar(binding.toolbar);
         initView();
         initData();
         loadData();
@@ -54,13 +48,12 @@ public class DetailNewsActivity extends BaseActivity {
 
     private void initView() {
 
-        navBar = binding.navBar;
         wbDetail = binding.wbDetail;
         webProgress = binding.webProgress;
 
-        navBar.setNavigationOnClickListener(new View.OnClickListener() {
+        binding.toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 finish();
             }
         });
@@ -94,13 +87,12 @@ public class DetailNewsActivity extends BaseActivity {
         handlerThread.start();
 
         contentId = getIntent().getStringExtra("contentId");
-    }
-
-    private void getUrl() {
-        url = PentiConst.BASE_URL;
-        url += "&" + "id=" + PentiConst.PENTI_WANG_ID;
-        String contentId = getIntent().getStringExtra("contentId");
-        url += "&" + "contentUuid=" + contentId;
+        String type = getIntent().getStringExtra("type");
+        if (PentiConst.TYPE_TUGUA.equals(type)) {
+            setTitle(TUGUA);
+        } else {
+            setTitle(PENTI_WANG);
+        }
     }
 
     private Runnable loadHtmlRunnable = new Runnable() {

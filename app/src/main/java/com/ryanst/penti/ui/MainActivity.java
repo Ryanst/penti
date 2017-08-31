@@ -19,8 +19,6 @@ import com.ryanst.penti.constant.PentiConst;
 import com.ryanst.penti.core.BaseActivity;
 import com.ryanst.penti.databinding.ActivityMainBinding;
 
-import java.util.List;
-
 public class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -30,7 +28,7 @@ public class MainActivity extends BaseActivity
     private FragmentManager fragmentManager;
 
     ActivityMainBinding binding;
-    private String selectedType = PentiConst.FRAGMENT_TYPE_PENTI_WANG;
+    private String selectedType = PentiConst.TYPE_PENTI_WANG;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,12 +36,12 @@ public class MainActivity extends BaseActivity
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         initView();
         fragmentManager = getSupportFragmentManager();
-        showFragment(PentiConst.FRAGMENT_TYPE_PENTI_WANG);
+        showFragment(PentiConst.TYPE_PENTI_WANG);
     }
 
     private void initView() {
 
-        toolbar = binding.layoutContentMain.layoutToolBar.toolbar;
+        toolbar = binding.layoutContentMain.toolbar;
         drawer = binding.drawerLayout;
         navView = binding.navView;
 
@@ -58,42 +56,26 @@ public class MainActivity extends BaseActivity
     }
 
     private void showFragment(String type) {
-
         setMainTitle(type);
-
-        List<Fragment> fragments = fragmentManager.getFragments();
         Fragment targetFragment = fragmentManager.findFragmentByTag(type);
         FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-
-        if (fragments != null && !fragments.isEmpty()) {
-            for (Fragment fragment : fragments) {
-                if (fragment != null) {
-                    transaction.hide(fragment);
-                }
-            }
-        }
-
-        transaction.commitAllowingStateLoss();
-
-        FragmentTransaction newTransaction = fragmentManager.beginTransaction();
-
         if (targetFragment == null) {
             targetFragment = NewsListFragment.getInstance(type);
-            newTransaction.add(R.id.fl_content, targetFragment, type);
+            transaction.add(R.id.fl_content, targetFragment, type);
         } else {
-            newTransaction.show(targetFragment);
+            transaction.replace(R.id.fl_content, targetFragment, type);
         }
+        transaction.commit();
 
-        newTransaction.commitAllowingStateLoss();
+        ((NewsListFragment) targetFragment).setRefresh();
     }
 
     private void setMainTitle(String type) {
         switch (type) {
-            case PentiConst.FRAGMENT_TYPE_PENTI_WANG:
+            case PentiConst.TYPE_PENTI_WANG:
                 setTitle(PentiConst.PENTI_WANG);
                 break;
-            case PentiConst.FRAGMENT_TYPE_TUGUA:
+            case PentiConst.TYPE_TUGUA:
                 setTitle(PentiConst.TUGUA);
                 break;
             default:
@@ -143,11 +125,11 @@ public class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_tugua) {
-            selectedType = PentiConst.FRAGMENT_TYPE_TUGUA;
-            showFragment(PentiConst.FRAGMENT_TYPE_TUGUA);
+            selectedType = PentiConst.TYPE_TUGUA;
+            showFragment(PentiConst.TYPE_TUGUA);
         } else if (id == R.id.nav_pentiwang) {
-            selectedType = PentiConst.FRAGMENT_TYPE_PENTI_WANG;
-            showFragment(PentiConst.FRAGMENT_TYPE_PENTI_WANG);
+            selectedType = PentiConst.TYPE_PENTI_WANG;
+            showFragment(PentiConst.TYPE_PENTI_WANG);
 //        } else if (id == R.id.nav_setting) {
 //
 //        } else if (id == R.id.nav_share) {

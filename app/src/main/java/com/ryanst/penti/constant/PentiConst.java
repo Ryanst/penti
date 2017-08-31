@@ -13,6 +13,6 @@ public class PentiConst {
     public static final String PENTI_WANG = "喷嚏网";
     public static final String TUGUA = "喷嚏图卦";
 
-    public static final String FRAGMENT_TYPE_PENTI_WANG = "pentiwang";
-    public static final String FRAGMENT_TYPE_TUGUA = "tugua";
+    public static final String TYPE_PENTI_WANG = "pentiwang";
+    public static final String TYPE_TUGUA = "tugua";
 }

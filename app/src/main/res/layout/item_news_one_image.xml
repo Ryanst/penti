@@ -9,7 +9,8 @@
             type="com.ryanst.penti.bean.News"></variable>
     </data>
 
-    <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.v7.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:id="@+id/cardView"
         android:layout_width="match_parent"
@@ -35,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:scaleType="centerCrop"
-                app:imageUrl="@{news.images[0]}" />
+                app:imageUrl="@{news.images[0]}"/>
 
             <FrameLayout
                 android:layout_width="0dp"
@@ -53,7 +54,7 @@
                     android:paddingTop="10dp"
                     android:text="@{news.title}"
                     android:textColor="@android:color/black"
-                    android:textSize="20sp" />
+                    android:textSize="20sp"/>
 
                 <TextView
                     android:id="@+id/tv_date"
@@ -62,7 +63,7 @@
                     android:layout_gravity="bottom"
                     android:padding="10dp"
                     android:text="@{news.posttime}"
-                    android:textColor="@android:color/darker_gray" />
+                    android:textColor="@android:color/darker_gray"/>
 
             </FrameLayout>
         </LinearLayout>

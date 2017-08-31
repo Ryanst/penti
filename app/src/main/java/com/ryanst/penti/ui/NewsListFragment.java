@@ -46,6 +46,7 @@ public class NewsListFragment extends BaseFragment {
     private static final int LOAD_MORE = 2;
     public static final int NETWORK_FAIL = -1;
     public static final int STOP_REFRESH = 0;
+    public static final String TYPE = "type";
 
     private RecyclerView rvNewList;
     private SwipeRefreshLayout swipeRefresh;
@@ -63,7 +64,9 @@ public class NewsListFragment extends BaseFragment {
 
     public static NewsListFragment getInstance(String type) {
         NewsListFragment fragment = new NewsListFragment();
-        fragment.setType(type);
+        Bundle bundle = new Bundle();
+        bundle.putString(TYPE, type);
+        fragment.setArguments(bundle);
         return fragment;
     }
 
@@ -71,23 +74,25 @@ public class NewsListFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_news_list, container, false);
+        initType();
         initView();
         initRecycleView();
-        initData();
+        refresh("");
         return binding.getRoot();
     }
 
-    private void initData() {
-        initTypeId();
-        refresh("");
-    }
+    private void initType() {
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            String type = bundle.getString(TYPE);
+            this.type = type;
+        }
 
-    private void initTypeId() {
         switch (type) {
-            case PentiConst.FRAGMENT_TYPE_PENTI_WANG:
+            case PentiConst.TYPE_PENTI_WANG:
                 typeId = PentiConst.PENTI_WANG_ID;
                 break;
-            case PentiConst.FRAGMENT_TYPE_TUGUA:
+            case PentiConst.TYPE_TUGUA:
                 typeId = PentiConst.TUGUA_ID;
                 break;
             default:
@@ -100,9 +105,7 @@ public class NewsListFragment extends BaseFragment {
 
         rvNewList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        rvNewList.addItemDecoration(new DividerItemDecoration(getActivity()));
-
-        adapter = new NewsAdapter(getActivity(), newsList);
+        adapter = new NewsAdapter(getActivity(), newsList, type);
 
         loadMoreAdapter = new HeaderAndFooterRecyclerViewAdapter(adapter);
 
@@ -120,10 +123,11 @@ public class NewsListFragment extends BaseFragment {
         }));
     }
 
-
     public void setRefresh() {
-        swipeRefresh.setRefreshing(true);
-        refresh("");
+        if (swipeRefresh != null) {
+            swipeRefresh.setRefreshing(true);
+            refresh("");
+        }
     }
 
     private void initView() {
@@ -213,13 +217,5 @@ public class NewsListFragment extends BaseFragment {
                         }
                     }
                 });
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
     }
 }
